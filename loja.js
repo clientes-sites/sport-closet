@@ -73,6 +73,13 @@ function wppMsg(p, sz) {
   return encodeURIComponent(`Olá! Tenho interesse no produto:\n\n*${p.nome}* (ID: ${p.id})${s}\n\nVi no seu site.`);
 }
 
+function formatPrice(p) {
+  if (isEu()) {
+    return p.eur && p.eur > 0 ? `€ ${p.eur.toFixed(2).replace('.', ',')}` : getLang().price;
+  }
+  return p.brl && p.brl > 0 ? `R$ ${p.brl.toFixed(2).replace('.', ',')}` : getLang().price;
+}
+
 const wppSvg = `<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.535 5.858L.057 23.633a.5.5 0 0 0 .61.61l5.775-1.478A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.944 9.944 0 0 1-5.088-1.392l-.363-.216-3.763.963.982-3.637-.237-.376A9.944 9.944 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>`;
 
 /* ─── FILTROS E BUSCA ───────────────────────────────────────────────────── */
@@ -129,7 +136,13 @@ function renderGrid() {
       const pNome = (p.nome || "").toLowerCase();
       const pLiga = (p.liga || "").toLowerCase();
 
-      const matchPageType = pTipo === pageType;
+      let matchPageType = false;
+      if (pageType === 'todos' || pageName === 'index') {
+          matchPageType = true;
+      } else {
+          matchPageType = pTipo === pageType || pTipo.includes(pageType) || pageType.includes(pTipo);
+      }
+
       const matchLigaFilter = pageName !== 'camisas' || activeFilters.liga === 'todos' || pLiga === activeFilters.liga;
       const matchMarcaFilter = pageName !== 'tenis' || activeFilters.marca === 'todos' || pMarca === activeFilters.marca;
       const matchPecaFilter = pageName !== 'roupas-verao' || activeFilters.peca === 'todos' || pNome.includes(activeFilters.peca);
@@ -171,7 +184,7 @@ function desenharCards(containerId, lista) {
         <div class="card-brand">${p.marca.toUpperCase()}</div>
         <div class="card-name">${tStr(p.nome)}</div>
         <div class="card-footer">
-          <div class="card-price">${lang.price}</div>
+          <div class="card-price">${formatPrice(p)}</div>
           <button class="wpp-btn" onclick="event.stopPropagation();window.open('https://wa.me/${WPP}?text=${wppMsg(p, null)}','_blank')">
             <svg viewBox="0 0 24 24" width="16" height="16"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.535 5.858L.057 23.633a.5.5 0 0 0 .61.61l5.775-1.478A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.944 9.944 0 0 1-5.088-1.392l-.363-.216-3.763.963.982-3.637-.237-.376A9.944 9.944 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
             ${lang.buy}
@@ -201,7 +214,7 @@ function openModal(id) {
   document.getElementById('mBrand').textContent = curProd.marca.toUpperCase();
   document.getElementById('mName').textContent = tStr(curProd.nome);
   document.getElementById('mType').textContent = (tStr(curProd.tipo) || "").toUpperCase();
-  document.getElementById('mPrice').textContent = lang.price;
+  document.getElementById('mPrice').textContent = formatPrice(curProd);
   document.getElementById('mDesc').textContent = curProd.desc || "";
 
   document.getElementById('mSizes').innerHTML = (curProd.sizes || ["P", "M", "G", "GG"])
@@ -291,4 +304,72 @@ function init() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', init);
+/* ─── INTEGRAÇÃO PLANILHA GOOGLE SHEETS ──────────────────────────────────── */
+const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTJJsi5MlreQayUKZtiZIwb0RcZCPa5ngJOkOmq-uCkKvtxVD8oRvYIJuYosn-22qsXtCsZsHJHfjhs/pub?output=csv";
+
+function bootStore() {
+  const sc = document.createElement('script');
+  sc.src = "https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js";
+  sc.onload = () => {
+    fetch(GOOGLE_SHEET_CSV_URL)
+      .then(r => r.text())
+      .then(csvText => {
+        Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            processCSVData(results.data);
+            init();
+          }
+        });
+      }).catch(err => {
+        console.error("Erro ao carregar do Google Sheets", err);
+        window.produtos = [];
+        window.todos = [];
+        init();
+      });
+  };
+  document.head.appendChild(sc);
+}
+
+function processCSVData(data) {
+  const finalProducts = [];
+  const getVal = (row, possibleKeys) => {
+    for (let k of possibleKeys) {
+      if (row[k] !== undefined) return String(row[k]).trim();
+    }
+    return '';
+  };
+
+  data.forEach((row, index) => {
+    const nome = getVal(row, ['nome_produto', 'nome', 'nome_produto ']);
+    if (!nome) return;
+
+    const imgs = [];
+    ['arquivo_foto_principal', 'arquivo_foto_2', 'arquivo_foto_3'].forEach(k => {
+      const v = row[k] ? row[k].trim() : '';
+      if (v) imgs.push(v);
+    });
+
+    const szStr = getVal(row, ['tamanhos', 'tamanho']);
+    const sep = szStr.includes(';') ? ';' : ',';
+    const sizes = szStr.split(sep).map(s => s.trim()).filter(s => s);
+
+    finalProducts.push({
+      id: index + 1,
+      nome: nome,
+      marca: getVal(row, ['marca']).toLowerCase(),
+      tipo: getVal(row, ['tipo']).toLowerCase(),
+      brl: parseFloat(getVal(row, ['preco_br', 'preco_brl', 'preco']).replace(',', '.')) || 0,
+      eur: parseFloat(getVal(row, ['preco_eur']).replace(',', '.')) || 0,
+      sizes: sizes,
+      desc: getVal(row, ['descricao', 'desc', 'descricao ']),
+      badge: getVal(row, ['badge', 'badge ']),
+      imgs: imgs
+    });
+  });
+  window.produtos = finalProducts;
+  window.todos = finalProducts;
+}
+
+document.addEventListener('DOMContentLoaded', bootStore);
