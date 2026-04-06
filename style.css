@@ -370,6 +370,7 @@ nav {
   transition: all 0.3s;
   transform: translateY(20px);
   opacity: 0;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
 }
 
 .slide-btn:hover {
