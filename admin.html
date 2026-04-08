@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sport Closet Admin</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body.admin-page { padding: 24px; }
+    .admin-header { max-width: 1180px; margin: 0 auto 24px; }
+    .admin-header h1 { margin: 0 0 12px; }
+    .admin-toolbar { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+    .admin-toolbar button, .admin-toolbar input[type=file] { padding: 10px 14px; border-radius: 8px; border: 1px solid #ccc; background: #fff; cursor: pointer; }
+    .admin-info { max-width: 1180px; margin-bottom: 20px; line-height: 1.6; }
+    .admin-table-wrapper { overflow-x: auto; margin-bottom: 20px; }
+    table.admin-table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+    table.admin-table th, table.admin-table td { padding: 10px 8px; border: 1px solid #ddd; vertical-align: top; }
+    table.admin-table th { background: #fafafa; text-align: left; white-space: nowrap; }
+    table.admin-table td input, table.admin-table td textarea { width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; padding: 6px 8px; font-size: 14px; }
+    .img-preview { max-width: 120px; max-height: 120px; object-fit: contain; border: 1px solid #ddd; border-radius: 8px; margin-top: 6px; }
+    .admin-footer { max-width: 1180px; margin-top: 24px; }
+    .notice { background: #f1f8ff; border: 1px solid #cfe3ff; padding: 14px 16px; border-radius: 12px; margin-bottom: 18px; }
+    .upload-section { max-width: 1180px; margin-bottom: 24px; }
+    .upload-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+    .upload-row select, .upload-row input, .upload-row button { min-width: 180px; padding: 10px 12px; border-radius: 8px; border: 1px solid #ccc; background: #fff; }
+    .upload-row input[type=file] { width: auto; }
+    .upload-status { margin-top: 12px; font-size: 14px; color: #333; }
+    .buttons-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+    .csv-output { width: 100%; min-height: 160px; margin-top: 12px; font-family: monospace; padding: 10px; border: 1px solid #ccc; border-radius: 8px; white-space: pre-wrap; background: #fff; }
+  </style>
+</head>
+<body class="admin-page">
+  <div id="authOverlay" class="auth-overlay">
+    <div class="auth-box">
+      <h2>Acesso ao Admin</h2>
+      <p>Digite a senha para acessar o painel de administração.</p>
+      <input type="password" id="adminPasswordInput" placeholder="Senha do admin">
+      <button type="button" id="adminLoginBtn">Entrar</button>
+      <div id="authError" class="auth-error"></div>
+    </div>
+  </div>
+  <div class="admin-header">
+    <h1>Sport Closet — Admin de Produtos</h1>
+    <div class="admin-info">
+      <p>Este painel permite editar os produtos do site e gerar o CSV novamente. As imagens podem ser referenciadas manualmente pelo nome do arquivo ou URL nos campos <strong>img_1 / img_2 / img_3</strong>.</p>
+      <p>Agora você também pode fazer upload direto para o Cloudflare R2. Informe sua <strong>Account ID</strong>, <strong>Bucket Name</strong> e o <strong>API Token</strong>, selecione o produto e a imagem.</p>
+      <p>Se quiser usar um domínio público customizado para as imagens, informe a URL no campo <strong>R2 Base URL</strong>; caso contrário, a URL será gerada com o padrão R2 público.</p>
+      <p>A senha padrão do painel é <code>sportcloset123</code>. Para alterá-la, edite a constante <code>ADMIN_PASSWORD</code> em <code>admin.js</code>.</p>
+      <p>Depois de editar, use o botão <strong>Exportar CSV</strong> para gerar o arquivo atualizado e substituir <code>Tabela_Sport_Closet_2026.csv</code> no projeto.</p>
+    </div>
+  </div>
+
+  <div class="admin-toolbar">
+    <label>
+      <input type="file" id="csvImport" accept=".csv" style="display:none">
+      <button type="button" id="btnImport">Importar CSV</button>
+    </label>
+    <button type="button" id="btnAdd">Adicionar produto</button>
+    <button type="button" id="btnExport">Exportar CSV</button>
+    <button type="button" id="btnExportJson">Exportar JSON</button>
+    <button type="button" id="btnCopy">Copiar saída</button>
+  </div>
+
+  <div class="upload-section notice">
+    <div><strong>Upload de imagem direto para Cloudflare R2</strong></div>
+    <div class="upload-row">
+      <select id="selectProductRow"></select>
+      <select id="selectImageSlot">
+        <option value="img_1">img_1</option>
+        <option value="img_2">img_2</option>
+        <option value="img_3">img_3</option>
+      </select>
+      <input type="file" id="imageFileUpload" accept="image/*">
+      <input type="text" id="cfAccountId" placeholder="Cloudflare Account ID">
+      <input type="text" id="cfBucketName" placeholder="Bucket Name">
+      <input type="text" id="cfR2BaseUrl" placeholder="R2 Base URL (opcional)">
+      <input type="password" id="cfApiToken" placeholder="Cloudflare API Token">
+      <button type="button" id="btnUploadImage">Upload e preencher</button>
+    </div>
+    <div id="uploadStatus" class="upload-status">Insira uma conta e token Cloudflare, escolha o produto e a imagem.</div>
+  </div>
+
+  <div class="admin-table-wrapper">
+    <table class="admin-table" id="adminTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Marca</th>
+          <th>Tipo</th>
+          <th>Liga</th>
+          <th>Preço BRL</th>
+          <th>Preço USD</th>
+          <th>img_1</th>
+          <th>img_2</th>
+          <th>img_3</th>
+          <th>Tamanhos</th>
+          <th>Descrição</th>
+          <th>Badge</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="adminBody"></tbody>
+    </table>
+  </div>
+
+  <div class="admin-footer">
+    <div class="buttons-row">
+      <button type="button" id="btnPreview">Atualizar preview</button>
+    </div>
+    <textarea id="csvOutput" class="csv-output" readonly placeholder="A saída exportada aparecerá aqui após clicar em Exportar CSV ou Exportar JSON..."></textarea>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

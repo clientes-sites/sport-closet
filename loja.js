@@ -1,6 +1,6 @@
 
 /* ─── CONFIGURAÇÕES ─────────────────────────────────────────────────────── */
-const WPP = '5551989912555';
+const WPP = '5531992082542';
 const BASE_URL_FOTOS = 'https://pub-9eb15062e53d4ad1a85362ac330e3002.r2.dev/';
 
 /* ─── ESTADO DA APLICAÇÃO ────────────────────────────────────────────────── */
@@ -36,7 +36,47 @@ const i18n = {
       { sub: "COPA 2026", title: "CAMISAS DE<br>SELEÇÃO", btn: "VEJA AGORA" },
       { sub: "PISANDO COM ESTILO", title: "OS MELHORES<br>TÊNIS", btn: "EXPLORE" },
       { sub: "PARA O DIA A DIA", title: "ROUPAS DE<br>VERÃO", btn: "CONFERIR" }
-    ]
+    ],
+    labels: {
+      searchPlaceholder: "Pesquisar produtos (nome, marca, tipo)...",
+      filterBrand: "Filtrar por Marca:",
+      filterLeague: "Filtrar por Liga:",
+      filterSponsor: "Filtrar por Patrocinadora:",
+      all: "TODAS",
+      other: "OUTRAS",
+      nav: {
+        copa2026: "Copa 2026",
+        camisas: "Camisas de Time",
+        tenis: "Tênis",
+        'roupas-verao': "Roupas de Verão"
+      },
+      section: {
+        index: ["LANÇAMENTOS IMPERDÍVEIS", "MAIS PROCURADOS"],
+        copa2026: "COPA 2026",
+        camisas: "CAMISAS DE TIME",
+        tenis: "TÊNIS",
+        'roupas-verao': "ROUPAS DE VERÃO"
+      },
+      heroSubtitle: {
+        copa2026: "COPA 2026",
+        camisas: "CATEGORIA",
+        tenis: "PISANDO COM ESTILO",
+        'roupas-verao': "PARA O DIA A DIA"
+      },
+      heroTitle: {
+        copa2026: "COPA 2026",
+        camisas: "CAMISAS DE TIME",
+        tenis: "OS MELHORES<br>TÊNIS",
+        'roupas-verao': "ROUPAS DE VERÃO"
+      },
+      modalSizeLabel: "Tamanho",
+      footer: "© 2026 Sport Closet — Todos os direitos reservados",
+      whatsappAria: "Falar no WhatsApp",
+      ticker: [
+        "BEM-VINDO À SPORT CLOSET",
+        "OS LANÇAMENTOS PARA A COPA DO MUNDO 2026 ESTÃO AQUI"
+      ]
+    }
   },
   en: {
     price: "Price on request",
@@ -48,6 +88,46 @@ const i18n = {
       { sub: "STYLE ON YOUR FEET", title: "THE BEST<br>SNEAKERS", btn: "EXPLORE" },
       { sub: "FOR YOUR DAILY", title: "SUMMER<br>WEAR", btn: "DISCOVER" }
     ],
+    labels: {
+      searchPlaceholder: "Search products (name, brand, type)...",
+      filterBrand: "Filter by Brand:",
+      filterLeague: "Filter by League:",
+      filterSponsor: "Filter by Sponsor:",
+      all: "ALL",
+      other: "OTHER",
+      nav: {
+        copa2026: "World Cup 2026",
+        camisas: "Club Jerseys",
+        tenis: "Sneakers",
+        'roupas-verao': "Summer Wear"
+      },
+      heroSubtitle: {
+        copa2026: "WORLD CUP 2026",
+        camisas: "CATEGORY",
+        tenis: "STYLE ON YOUR FEET",
+        'roupas-verao': "FOR YOUR DAILY"
+      },
+      heroTitle: {
+        copa2026: "WORLD CUP 2026",
+        camisas: "CLUB JERSEYS",
+        tenis: "THE BEST<br>SNEAKERS",
+        'roupas-verao': "SUMMER WEAR"
+      },
+      section: {
+        index: ["NEW RELEASES", "MOST WANTED"],
+        copa2026: "WORLD CUP 2026",
+        camisas: "CLUB JERSEYS",
+        tenis: "SNEAKERS",
+        'roupas-verao': "SUMMER WEAR"
+      },
+      modalSizeLabel: "Size",
+      footer: "© 2026 Sport Closet — All rights reserved",
+      whatsappAria: "Chat on WhatsApp",
+      ticker: [
+        "WELCOME TO SPORT CLOSET",
+        "THE WORLD CUP 2026 COLLECTION IS HERE"
+      ]
+    },
     types: {
       "camisa de time": "Club Jersey",
       "camisa de seleção": "National Jersey",
@@ -81,8 +161,13 @@ function tStr(str) {
 }
 
 function wppMsg(p, sz) {
-  const s = sz ? ` | Tamanho: ${sz}` : '';
-  return encodeURIComponent(`Olá! Tenho interesse no produto:\n\n*${p.nome}* (ID: ${p.id})${s}\n\nVi no seu site.`);
+  const lang = getLang();
+  const sizeLabel = isUsa() ? 'Size' : 'Tamanho';
+  const sizePart = sz ? ` | ${sizeLabel}: ${sz}` : '';
+  const message = isUsa()
+    ? `Hello! I am interested in the product:\n\n*${p.nome}* (ID: ${p.id})${sizePart}\n\nI saw it on your website.`
+    : `Olá! Tenho interesse no produto:\n\n*${p.nome}* (ID: ${p.id})${sizePart}\n\nVi no seu site.`;
+  return encodeURIComponent(message);
 }
 
 function formatPrice(p) {
@@ -121,9 +206,91 @@ function toggleRegion() {
   renderGrid();
 }
 
+function toggleBrandsDropdown(event) {
+  event.stopPropagation();
+  const dropdown = document.getElementById('brandsDropdown');
+  if (dropdown) {
+    dropdown.classList.toggle('open');
+  }
+}
+
 /* ─── ATUALIZAÇÃO DE TEXTOS DINÂMICOS ──────────────────────────────────────── */
 function updateStaticTexts() {
   const lang = getLang();
+
+  // Search input placeholder
+  document.querySelectorAll('.nav-search-input').forEach(input => {
+    input.placeholder = lang.labels.searchPlaceholder;
+  });
+
+  // Navigation labels
+  document.querySelectorAll('.brand-links a[href="copa2026.html"]').forEach(a => a.textContent = lang.labels.nav.copa2026);
+  document.querySelectorAll('.brand-links a[href="camisas.html"]').forEach(a => a.textContent = lang.labels.nav.camisas);
+  document.querySelectorAll('.brand-links a[href="tenis.html"]').forEach(a => a.textContent = lang.labels.nav.tenis);
+  document.querySelectorAll('.brand-links a[href="roupas-verao.html"]').forEach(a => a.textContent = lang.labels.nav['roupas-verao']);
+
+  // Ticker texts
+  const tickerTexts = lang.labels.ticker || [];
+  document.querySelectorAll('.ticker-inner span').forEach((span, idx) => {
+    if (idx % 2 === 0 && tickerTexts.length > 0) {
+      const messageIndex = Math.floor(idx / 2) % tickerTexts.length;
+      span.textContent = tickerTexts[messageIndex];
+    }
+  });
+
+  // Modal and footer labels
+  document.querySelectorAll('.m-label').forEach(el => {
+    el.textContent = lang.labels.modalSizeLabel;
+  });
+  const footerText = document.querySelector('footer div');
+  if (footerText) footerText.textContent = lang.labels.footer;
+  const wppFloat = document.querySelector('.wpp-float');
+  if (wppFloat) wppFloat.setAttribute('aria-label', lang.labels.whatsappAria);
+
+  // Filter labels
+  const filterLabel = document.querySelector('.fg-label');
+  if (filterLabel) {
+    if (pageName === 'camisas') {
+      filterLabel.textContent = lang.labels.filterLeague;
+    } else if (pageName === 'copa2026') {
+      filterLabel.textContent = lang.labels.filterSponsor;
+    } else {
+      filterLabel.textContent = lang.labels.filterBrand;
+    }
+  }
+
+  // Section/title texts
+  if (pageName === 'index' && Array.isArray(lang.labels.section.index)) {
+    document.querySelectorAll('.section-title').forEach((el, idx) => {
+      if (lang.labels.section.index[idx]) {
+        el.textContent = lang.labels.section.index[idx];
+      }
+    });
+  } else {
+    const sectionTitle = document.querySelector('.section-title');
+    if (sectionTitle && lang.labels.section[pageName]) {
+      sectionTitle.innerHTML = lang.labels.section[pageName];
+    }
+  }
+
+  const heroSubtitle = document.querySelector('.slide-subtitle');
+  if (heroSubtitle && lang.labels.heroSubtitle[pageName]) {
+    heroSubtitle.textContent = lang.labels.heroSubtitle[pageName];
+  }
+
+  const heroTitle = document.querySelector('.slide-title');
+  if (heroTitle && lang.labels.heroTitle[pageName]) {
+    heroTitle.innerHTML = lang.labels.heroTitle[pageName];
+  }
+
+  document.querySelectorAll('.fb[data-v="todos"]').forEach(btn => {
+    btn.textContent = lang.labels.all;
+  });
+
+  document.querySelectorAll('.fb[data-v="outras"]').forEach(btn => {
+    btn.textContent = lang.labels.other;
+  });
+
   if (pageName === 'index') {
     const slides = document.querySelectorAll('#heroSlider .slide');
     slides.forEach((slide, idx) => {
@@ -132,6 +299,30 @@ function updateStaticTexts() {
       slide.querySelector('.slide-title').innerHTML = lang.slides[idx].title;
       slide.querySelector('.slide-btn').textContent = lang.slides[idx].btn;
     });
+  }
+
+  // Page title tag
+  const titleMap = {
+    index: 'Sport Closet — Camisas de Time, Tênis e Roupas de Verão',
+    copa2026: 'Copa 2026 — Sport Closet',
+    camisas: 'Camisas de Time — Sport Closet',
+    tenis: 'Tênis — Sport Closet',
+    'roupas-verao': 'Roupas de Verão — Sport Closet'
+  };
+
+  if (document.title && titleMap[pageName]) {
+    document.title = titleMap[pageName];
+  }
+
+  if (isUsa()) {
+    const titleMapEn = {
+      index: 'Sport Closet — Club Jerseys, Sneakers and Summer Wear',
+      copa2026: 'World Cup 2026 — Sport Closet',
+      camisas: 'Club Jerseys — Sport Closet',
+      tenis: 'Sneakers — Sport Closet',
+      'roupas-verao': 'Summer Wear — Sport Closet'
+    };
+    document.title = titleMapEn[pageName] || document.title;
   }
 }
 
@@ -165,20 +356,20 @@ function renderGrid() {
       if (pageType === 'todos' || pageName === 'index') {
           matchPageType = true;
       } else if (Array.isArray(pageType)) {
-          matchPageType = pageType.includes(pTipo);
+          matchPageType = pageType.map(pt => norm(pt)).includes(pTipo);
       } else {
-          matchPageType = pTipo === pageType;
+          matchPageType = pTipo === norm(pageType);
       }
 
-      const matchLigaFilter = pageName !== 'camisas' || activeFilters.liga === 'todos' || pLiga === activeFilters.liga;
-      const matchMarcaFilter = (pageName !== 'tenis' && pageName !== 'roupas-verao') || activeFilters.marca === 'todos' || pMarca === activeFilters.marca;
+      const matchLigaFilter = pageName !== 'camisas' || activeFilters.liga === 'todos' || pLiga === norm(activeFilters.liga);
+      const matchMarcaFilter = (pageName !== 'tenis' && pageName !== 'roupas-verao') || activeFilters.marca === 'todos' || pMarca === norm(activeFilters.marca);
       
       let matchCopaSponsor = true;
       if (pageName === 'copa2026' && activeFilters.tipo !== 'todos') {
           if (activeFilters.tipo === 'outras') {
               matchCopaSponsor = !['nike', 'adidas', 'puma'].includes(pMarca);
           } else {
-              matchCopaSponsor = pMarca === activeFilters.tipo;
+              matchCopaSponsor = pMarca === norm(activeFilters.tipo);
           }
       }
 
@@ -358,18 +549,19 @@ function init() {
 }
 
 /* ─── CARREGAMENTO DOS DADOS DO CSV LOCAL ──────────────────────────────── */
+const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTJJsi5MlreQayUKZtiZIwb0RcZCPa5ngJOkOmq-uCkKvtxVD8oRvYIJuYosn-22qsXtCsZsHJHfjhs/pub?output=csv';
 const LOCAL_CSV_URL = 'Tabela_Sport_Closet_2026.csv';
 
 function bootStore() {
   const sc = document.createElement('script');
   sc.src = "https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js";
   sc.onload = () => {
-    fetch(LOCAL_CSV_URL)
+    fetch(GOOGLE_SHEET_CSV_URL)
       .then(response => {
-          if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.text();
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
       })
       .then(csvText => {
         Papa.parse(csvText, {
@@ -380,25 +572,53 @@ function bootStore() {
             init();
           },
           error: function(err) {
-            console.error("Erro ao parsear CSV:", err);
-            window.produtos = [];
-            init();
+            console.error("Erro ao parsear CSV do Google Sheets:", err);
+            loadFallbackCsv();
           }
         });
-      }).catch(err => {
-        console.error("Erro ao carregar do CSV local", err);
-        const grid = document.getElementById('grid');
-        if(grid) grid.innerHTML = '<div class="empty">Erro ao carregar produtos. Verifique o console.</div>';
-        window.produtos = [];
-        init();
+      })
+      .catch(err => {
+        console.warn("Não foi possível carregar o Google Sheets. Usando CSV local como fallback.", err);
+        loadFallbackCsv();
       });
   };
   document.head.appendChild(sc);
 }
 
+function loadFallbackCsv() {
+  fetch(LOCAL_CSV_URL)
+    .then(response => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then(csvText => {
+      Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          processCSVData(results.data);
+          init();
+        },
+        error: function(err) {
+          console.error("Erro ao parsear CSV local:", err);
+          window.produtos = [];
+          init();
+        }
+      });
+    }).catch(err => {
+      console.error("Erro ao carregar CSV local", err);
+      const grid = document.getElementById('grid');
+      if(grid) grid.innerHTML = '<div class="empty">Erro ao carregar produtos. Verifique o console.</div>';
+      window.produtos = [];
+      init();
+    });
+}
+
 function processCSVData(data) {
   window.produtos = data.map((row, index) => {
-    const szStr = row.tamanhos || '';
+    const szStr = row.tamanhos || row.sizes || '';
     const sep = szStr.includes(';') ? ';' : ',';
     const tamanhos = szStr.split(sep).map(s => s.trim()).filter(s => s);
 
