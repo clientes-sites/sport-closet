@@ -1,118 +1,1066 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sport Closet Admin</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body.admin-page { padding: 24px; }
-    .admin-header { max-width: 1180px; margin: 0 auto 24px; }
-    .admin-header h1 { margin: 0 0 12px; }
-    .admin-toolbar { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
-    .admin-toolbar button, .admin-toolbar input[type=file] { padding: 10px 14px; border-radius: 8px; border: 1px solid #ccc; background: #fff; cursor: pointer; }
-    .admin-info { max-width: 1180px; margin-bottom: 20px; line-height: 1.6; }
-    .admin-table-wrapper { overflow-x: auto; margin-bottom: 20px; }
-    table.admin-table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-    table.admin-table th, table.admin-table td { padding: 10px 8px; border: 1px solid #ddd; vertical-align: top; }
-    table.admin-table th { background: #fafafa; text-align: left; white-space: nowrap; }
-    table.admin-table td input, table.admin-table td textarea { width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; padding: 6px 8px; font-size: 14px; }
-    .img-preview { max-width: 120px; max-height: 120px; object-fit: contain; border: 1px solid #ddd; border-radius: 8px; margin-top: 6px; }
-    .admin-footer { max-width: 1180px; margin-top: 24px; }
-    .notice { background: #f1f8ff; border: 1px solid #cfe3ff; padding: 14px 16px; border-radius: 12px; margin-bottom: 18px; }
-    .upload-section { max-width: 1180px; margin-bottom: 24px; }
-    .upload-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
-    .upload-row select, .upload-row input, .upload-row button { min-width: 180px; padding: 10px 12px; border-radius: 8px; border: 1px solid #ccc; background: #fff; }
-    .upload-row input[type=file] { width: auto; }
-    .upload-status { margin-top: 12px; font-size: 14px; color: #333; }
-    .buttons-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-    .csv-output { width: 100%; min-height: 160px; margin-top: 12px; font-family: monospace; padding: 10px; border: 1px solid #ccc; border-radius: 8px; white-space: pre-wrap; background: #fff; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sport Closet — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161920;
+    --surface2: #1e2229;
+    --border: #2a2f3a;
+    --accent: #e8ff47;
+    --accent-dim: #c8df30;
+    --text: #edf0f7;
+    --text-muted: #7a8394;
+    --danger: #ff4d6d;
+    --success: #43e97b;
+    --warning: #ffa940;
+    --input-bg: #1a1e27;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  /* ── AUTH OVERLAY ── */
+  .auth-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .auth-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 40px;
+    width: 360px;
+    text-align: center;
+  }
+  .auth-box .logo-badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #0d0f14;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .auth-box h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .auth-box p { color: var(--text-muted); margin-bottom: 28px; font-size: 13px; }
+  .auth-box input {
+    width: 100%; padding: 12px 16px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 12px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .auth-box input:focus { border-color: var(--accent); }
+  .auth-box button {
+    width: 100%; padding: 12px;
+    background: var(--accent);
+    color: #0d0f14;
+    border: none; border-radius: var(--radius);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 14px;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+  }
+  .auth-box button:hover { background: var(--accent-dim); }
+  .auth-box button:active { transform: scale(0.98); }
+  .auth-error { color: var(--danger); font-size: 12px; margin-top: 10px; min-height: 16px; }
+
+  /* ── LAYOUT ── */
+  .admin-layout { display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar {
+    width: 220px; flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 28px 0;
+    display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .sidebar-logo {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .sidebar-logo span {
+    display: block;
+    background: var(--accent);
+    color: #0d0f14;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 10px;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px;
+    display: inline-block; margin-bottom: 8px;
+  }
+  .sidebar-logo h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 16px;
+    line-height: 1.2;
+  }
+  .sidebar-logo h1 em { color: var(--accent); font-style: normal; }
+
+  .sidebar-nav { flex: 1; }
+  .nav-section-title {
+    padding: 0 20px 6px;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .nav-btn {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; padding: 10px 20px;
+    background: none; border: none;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer; text-align: left;
+    transition: color .15s, background .15s;
+    border-left: 2px solid transparent;
+  }
+  .nav-btn:hover { color: var(--text); background: var(--surface2); }
+  .nav-btn.active { color: var(--accent); border-left-color: var(--accent); background: rgba(232,255,71,.06); }
+  .nav-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  .sidebar-stats {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+  .stat-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px;
+  }
+  .stat-chip .val {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px; font-weight: 500;
+    color: var(--accent);
+  }
+
+  /* Main */
+  .main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+  .top-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .top-bar-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 15px;
+  }
+  .top-bar-actions { display: flex; gap: 8px; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    transition: border-color .15s, background .15s, transform .1s;
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--text-muted); background: #252b36; }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary {
+    background: var(--accent); color: #0d0f14;
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  .btn-primary:hover { background: var(--accent-dim); border-color: var(--accent-dim); }
+  .btn-danger { color: var(--danger); border-color: rgba(255,77,109,.3); }
+  .btn-danger:hover { background: rgba(255,77,109,.1); border-color: var(--danger); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn svg { width: 14px; height: 14px; }
+
+  /* Panels */
+  .panel { padding: 24px 28px; }
+  .panel-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .panel-card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 13px;
+    letter-spacing: .5px; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel-card-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: var(--border);
+  }
+
+  /* Search/filter bar */
+  .filter-bar {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    align-items: center; margin-bottom: 20px;
+  }
+  .search-wrap {
+    position: relative; flex: 1; min-width: 200px;
+  }
+  .search-wrap svg {
+    position: absolute; left: 12px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted); width: 14px; height: 14px; pointer-events: none;
+  }
+  .search-wrap input {
+    width: 100%; padding: 9px 12px 9px 36px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text); font-size: 13px;
+    outline: none; transition: border-color .2s;
+  }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap input::placeholder { color: var(--text-muted); }
+
+  select.filter-select {
+    padding: 9px 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text); font-size: 13px;
+    outline: none; cursor: pointer;
+    transition: border-color .2s;
+  }
+  select.filter-select:focus { border-color: var(--accent); }
+
+  /* Table */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  table.prod-table {
+    width: 100%; border-collapse: collapse; min-width: 1400px;
+  }
+  table.prod-table thead { position: sticky; top: 0; z-index: 10; }
+  table.prod-table th {
+    background: var(--surface);
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    font-weight: 500; letter-spacing: .5px; text-transform: uppercase;
+    color: var(--text-muted); white-space: nowrap;
+  }
+  table.prod-table td {
+    padding: 8px 8px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.prod-table tr:last-child td { border-bottom: none; }
+  table.prod-table tr:hover td { background: rgba(255,255,255,.02); }
+
+  table.prod-table td input,
+  table.prod-table td textarea {
+    width: 100%;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px;
+    padding: 5px 7px; outline: none;
+    transition: border-color .15s, background .15s;
+    resize: vertical;
+  }
+  table.prod-table td input:focus,
+  table.prod-table td textarea:focus {
+    border-color: var(--accent);
+    background: var(--input-bg);
+  }
+  table.prod-table td input:hover,
+  table.prod-table td textarea:hover {
+    border-color: var(--border);
+    background: var(--input-bg);
+  }
+
+  .img-cell { min-width: 140px; }
+  .img-preview {
+    display: block; max-width: 80px; max-height: 80px;
+    object-fit: contain; border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface2); margin-top: 6px;
+  }
+
+  .row-num {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    color: var(--text-muted); text-align: center; padding: 0 6px;
+  }
+
+  .badge-chip {
+    display: inline-block;
+    background: rgba(232,255,71,.15);
+    color: var(--accent);
+    border: 1px solid rgba(232,255,71,.25);
+    border-radius: 20px;
+    padding: 2px 8px; font-size: 11px; font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Upload section */
+  .upload-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .upload-grid input, .upload-grid select {
+    width: 100%; padding: 9px 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text); font-size: 13px; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: border-color .2s;
+  }
+  .upload-grid input:focus, .upload-grid select:focus { border-color: var(--accent); }
+  .upload-grid input::placeholder { color: var(--text-muted); }
+  .upload-grid input[type=file] { color: var(--text-muted); }
+  .upload-grid input[type=file]::file-selector-button {
+    padding: 4px 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 4px; color: var(--text); cursor: pointer; font-size: 12px;
+    margin-right: 8px;
+  }
+  .upload-status {
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    background: var(--surface2); border: 1px solid var(--border);
+    font-size: 13px; color: var(--text-muted);
+    margin-top: 12px;
+  }
+  .upload-status.ok { color: var(--success); border-color: rgba(67,233,123,.3); background: rgba(67,233,123,.06); }
+  .upload-status.err { color: var(--danger); border-color: rgba(255,77,109,.3); background: rgba(255,77,109,.06); }
+
+  /* Output area */
+  .csv-output {
+    width: 100%;
+    min-height: 160px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace; font-size: 12px;
+    padding: 14px; resize: vertical; outline: none;
+  }
+
+  /* Toast */
+  #toast {
+    position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 18px;
+    font-size: 13px; font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    transform: translateY(80px); opacity: 0;
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+    pointer-events: none; max-width: 320px;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.success { border-color: rgba(67,233,123,.4); color: var(--success); }
+  #toast.error { border-color: rgba(255,77,109,.4); color: var(--danger); }
+
+  /* Confirm dialog */
+  .confirm-dialog {
+    position: fixed; inset: 0; z-index: 9998;
+    background: rgba(0,0,0,.7);
+    display: none; align-items: center; justify-content: center;
+  }
+  .confirm-dialog.open { display: flex; }
+  .confirm-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 28px 20px;
+    width: 360px;
+  }
+  .confirm-box h3 { font-family: 'Syne', sans-serif; font-size: 16px; margin-bottom: 8px; }
+  .confirm-box p { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+  .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex; gap: 4px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+  }
+  .tab-btn {
+    padding: 12px 16px;
+    background: none; border: none; border-bottom: 2px solid transparent;
+    color: var(--text-muted); font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: color .15s, border-color .15s;
+    margin-bottom: -1px;
+  }
+  .tab-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+  .tab-btn:hover:not(.active) { color: var(--text); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .hidden { display: none !important; }
+  
+  /* password toggle */
+  .pass-wrap { position: relative; }
+  .pass-wrap input { padding-right: 40px; }
+  .pass-toggle {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--text-muted); cursor: pointer;
+    padding: 4px; display: flex; align-items: center;
+  }
+
+  @media (max-width: 800px) {
+    .sidebar { display: none; }
+    .top-bar { padding: 12px 16px; }
+    .panel { padding: 16px; }
+  }
+</style>
 </head>
-<body class="admin-page">
-  <div id="authOverlay" class="auth-overlay">
-    <div class="auth-box">
-      <h2>Acesso ao Admin</h2>
-      <p>Digite a senha para acessar o painel de administração.</p>
-      <input type="password" id="adminPasswordInput" placeholder="Senha do admin">
-      <button type="button" id="adminLoginBtn">Entrar</button>
-      <div id="authError" class="auth-error"></div>
+<body>
+
+<!-- AUTH OVERLAY -->
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-box">
+    <span class="logo-badge">Admin</span>
+    <h2>Sport <em>Closet</em></h2>
+    <p>Digite a senha para acessar o painel.</p>
+    <div class="pass-wrap">
+      <input type="password" id="adminPasswordInput" placeholder="••••••••••••">
+      <button class="pass-toggle" type="button" id="passToggle" title="Mostrar senha">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <button type="button" id="adminLoginBtn">Entrar</button>
+    <div id="authError" class="auth-error"></div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-dialog" id="confirmDialog">
+  <div class="confirm-box">
+    <h3 id="confirmTitle">Confirmar ação</h3>
+    <p id="confirmMsg">Tem certeza?</p>
+    <div class="confirm-actions">
+      <button class="btn" id="confirmCancel">Cancelar</button>
+      <button class="btn btn-danger" id="confirmOk">Excluir</button>
     </div>
   </div>
-  <div class="admin-header">
-    <h1>Sport Closet — Admin de Produtos</h1>
-    <div class="admin-info">
-      <p>Este painel permite editar os produtos do site e gerar o CSV novamente. As imagens podem ser referenciadas manualmente pelo nome do arquivo ou URL nos campos <strong>img_1 / img_2 / img_3</strong>.</p>
-      <p>Agora você também pode fazer upload direto para o Cloudflare R2. Informe sua <strong>Account ID</strong>, <strong>Bucket Name</strong> e o <strong>API Token</strong>, selecione o produto e a imagem.</p>
-      <p>Se quiser usar um domínio público customizado para as imagens, informe a URL no campo <strong>R2 Base URL</strong>; caso contrário, a URL será gerada com o padrão R2 público.</p>
-      <p>A senha padrão do painel é <code>sportcloset123</code>. Para alterá-la, edite a constante <code>ADMIN_PASSWORD</code> em <code>admin.js</code>.</p>
-      <p>Depois de editar, use o botão <strong>Exportar CSV</strong> para gerar o arquivo atualizado e substituir <code>Tabela_Sport_Closet_2026.csv</code> no projeto.</p>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- MAIN LAYOUT -->
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span>Admin</span>
+      <h1>Sport <em>Closet</em></h1>
     </div>
-  </div>
-
-  <div class="admin-toolbar">
-    <label>
-      <input type="file" id="csvImport" accept=".csv" style="display:none">
-      <button type="button" id="btnImport">Importar CSV</button>
-    </label>
-    <button type="button" id="btnAdd">Adicionar produto</button>
-    <button type="button" id="btnExport">Exportar CSV</button>
-    <button type="button" id="btnExportJson">Exportar JSON</button>
-    <button type="button" id="btnCopy">Copiar saída</button>
-  </div>
-
-  <div class="upload-section notice">
-    <div><strong>Upload de imagem direto para Cloudflare R2</strong></div>
-    <div class="upload-row">
-      <select id="selectProductRow"></select>
-      <select id="selectImageSlot">
-        <option value="img_1">img_1</option>
-        <option value="img_2">img_2</option>
-        <option value="img_3">img_3</option>
-      </select>
-      <input type="file" id="imageFileUpload" accept="image/*">
-      <input type="text" id="cfAccountId" placeholder="Cloudflare Account ID">
-      <input type="text" id="cfBucketName" placeholder="Bucket Name">
-      <input type="text" id="cfR2BaseUrl" placeholder="R2 Base URL (opcional)">
-      <input type="password" id="cfApiToken" placeholder="Cloudflare API Token">
-      <button type="button" id="btnUploadImage">Upload e preencher</button>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Painel</div>
+      <button class="nav-btn active" data-tab="produtos">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Produtos
+      </button>
+      <button class="nav-btn" data-tab="upload">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        Upload R2
+      </button>
+      <button class="nav-btn" data-tab="exportar">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar
+      </button>
+    </nav>
+    <div class="sidebar-stats">
+      <div class="stat-chip">
+        <span>Produtos</span>
+        <span class="val" id="statCount">0</span>
+      </div>
     </div>
-    <div id="uploadStatus" class="upload-status">Insira uma conta e token Cloudflare, escolha o produto e a imagem.</div>
-  </div>
+  </aside>
 
-  <div class="admin-table-wrapper">
-    <table class="admin-table" id="adminTable">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>Marca</th>
-          <th>Tipo</th>
-          <th>Liga</th>
-          <th>Preço BRL</th>
-          <th>Preço USD</th>
-          <th>img_1</th>
-          <th>img_2</th>
-          <th>img_3</th>
-          <th>Tamanhos</th>
-          <th>Descrição</th>
-          <th>Badge</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody id="adminBody"></tbody>
-    </table>
-  </div>
+  <div class="main-content">
 
-  <div class="admin-footer">
-    <div class="buttons-row">
-      <button type="button" id="btnPreview">Atualizar preview</button>
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <div class="top-bar-title" id="topBarTitle">Produtos</div>
+      <div class="top-bar-actions">
+        <label>
+          <input type="file" id="csvImport" accept=".csv" class="hidden">
+          <button class="btn" type="button" id="btnImport">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+            Importar CSV
+          </button>
+        </label>
+        <button class="btn btn-primary" type="button" id="btnAdd">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Produto
+        </button>
+        <button class="btn" type="button" id="btnLogout" title="Sair">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair
+        </button>
+      </div>
     </div>
-    <textarea id="csvOutput" class="csv-output" readonly placeholder="A saída exportada aparecerá aqui após clicar em Exportar CSV ou Exportar JSON..."></textarea>
-  </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <script src="admin.js"></script>
+    <!-- TABS -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="produtos">Produtos</button>
+      <button class="tab-btn" data-tab="upload">Upload R2</button>
+      <button class="tab-btn" data-tab="exportar">Exportar / Saída</button>
+    </div>
+
+    <!-- TAB: PRODUTOS -->
+    <div class="tab-panel active panel" id="tab-produtos">
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchInput" placeholder="Buscar produto, marca, liga…">
+        </div>
+        <select class="filter-select" id="filterMarca">
+          <option value="">Todas as marcas</option>
+        </select>
+        <select class="filter-select" id="filterTipo">
+          <option value="">Todos os tipos</option>
+        </select>
+        <span id="filteredCount" style="color:var(--text-muted);font-size:12px;font-family:'DM Mono',monospace;white-space:nowrap;"></span>
+      </div>
+      <div class="table-wrap">
+        <table class="prod-table" id="adminTable">
+          <thead>
+            <tr>
+              <th style="width:40px;">#</th>
+              <th style="width:60px;">ID</th>
+              <th style="min-width:180px;">Nome</th>
+              <th style="width:100px;">Marca</th>
+              <th style="width:90px;">Tipo</th>
+              <th style="width:90px;">Liga</th>
+              <th style="width:80px;">R$ BRL</th>
+              <th style="width:80px;">$ USD</th>
+              <th class="img-cell">img_1</th>
+              <th class="img-cell">img_2</th>
+              <th class="img-cell">img_3</th>
+              <th style="min-width:120px;">Tamanhos</th>
+              <th style="min-width:160px;">Descrição</th>
+              <th style="width:90px;">Badge</th>
+              <th style="width:60px;"></th>
+            </tr>
+          </thead>
+          <tbody id="adminBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: UPLOAD R2 -->
+    <div class="tab-panel panel" id="tab-upload">
+      <div class="panel-card">
+        <div class="panel-card-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+          Upload direto para Cloudflare R2
+        </div>
+        <div class="upload-grid">
+          <select id="selectProductRow">
+            <option value="">Selecionar produto…</option>
+          </select>
+          <select id="selectImageSlot">
+            <option value="img_1">img_1</option>
+            <option value="img_2">img_2</option>
+            <option value="img_3">img_3</option>
+          </select>
+          <input type="file" id="imageFileUpload" accept="image/*">
+          <input type="text" id="cfAccountId" placeholder="Cloudflare Account ID">
+          <input type="text" id="cfBucketName" placeholder="Bucket Name">
+          <input type="text" id="cfR2BaseUrl" placeholder="R2 Base URL (opcional)">
+          <div class="pass-wrap">
+            <input type="password" id="cfApiToken" placeholder="Cloudflare API Token" style="padding-right:40px">
+            <button class="pass-toggle" type="button" id="cfTokenToggle" title="Mostrar token">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <button type="button" id="btnUploadImage" class="btn btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+            Fazer Upload
+          </button>
+        </div>
+        <div id="uploadStatus" class="upload-status">Insira a conta Cloudflare, escolha o produto e a imagem.</div>
+      </div>
+    </div>
+
+    <!-- TAB: EXPORTAR -->
+    <div class="tab-panel panel" id="tab-exportar">
+      <div class="panel-card">
+        <div class="panel-card-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Ações de exportação
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" type="button" id="btnExport">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar CSV
+          </button>
+          <button class="btn" type="button" id="btnExportJson">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar JSON
+          </button>
+          <button class="btn" type="button" id="btnCopy">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copiar saída
+          </button>
+        </div>
+      </div>
+      <div class="panel-card">
+        <div class="panel-card-title">Prévia da saída</div>
+        <textarea id="csvOutput" class="csv-output" readonly placeholder="Clique em Exportar CSV ou Exportar JSON para ver a saída aqui…"></textarea>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+const BASE_URL_FOTOS = 'https://pub-9eb15062e53d4ad1a85362ac330e3002.r2.dev/';
+const CSV_URL = 'Tabela_Sport_Closet_2026.csv';
+const ADMIN_PASSWORD = 'sportcloset123';
+const AUTH_KEY = 'sport_closet_admin_authenticated';
+const CF_CREDS_KEY = 'sc_cf_creds';
+
+let adminProducts = [];
+let filteredIndices = [];
+let pendingDeleteIndex = null;
+
+// ── AUTH ─────────────────────────────────────────────────
+function isAuth() { return localStorage.getItem(AUTH_KEY) === '1'; }
+function setAuth(v) { localStorage.setItem(AUTH_KEY, v ? '1' : '0'); }
+
+function handleLogin() {
+  const input = document.getElementById('adminPasswordInput');
+  const error = document.getElementById('authError');
+  if (input.value.trim() === ADMIN_PASSWORD) {
+    setAuth(true);
+    document.getElementById('authOverlay').style.display = 'none';
+    initAdmin();
+  } else {
+    error.textContent = 'Senha incorreta. Tente novamente.';
+    input.value = '';
+    input.focus();
+  }
+}
+
+// ── TOAST ────────────────────────────────────────────────
+let toastTimer;
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = ''; }, 3000);
+}
+
+// ── CONFIRM DIALOG ────────────────────────────────────────
+function showConfirm(title, msg, onOk) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('confirmDialog').classList.add('open');
+  document.getElementById('confirmOk').onclick = () => {
+    document.getElementById('confirmDialog').classList.remove('open');
+    onOk();
+  };
+}
+
+// ── DATA ─────────────────────────────────────────────────
+function fetchCsv() {
+  fetch(CSV_URL)
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+    .then(text => {
+      const result = Papa.parse(text, { header: true, skipEmptyLines: true });
+      loadProducts(result.data);
+    })
+    .catch(err => {
+      console.error(err);
+      toast('Não foi possível carregar o CSV. Use Importar CSV.', 'error');
+    });
+}
+
+function loadProducts(rows) {
+  adminProducts = rows.map((row, i) => ({
+    id: row.id || String(i + 1),
+    nome: row.nome || '',
+    marca: row.marca || '',
+    tipo: row.tipo || '',
+    liga: row.liga || '',
+    preco_brl: row.preco_brl || row.preco_br || row.preco || '',
+    preco_usa: row.preco_usa || row.preco_usd || row.usd || '',
+    img_1: row.img_1 || '',
+    img_2: row.img_2 || '',
+    img_3: row.img_3 || '',
+    tamanhos: row.tamanhos || row.sizes || '',
+    descricao: row.descricao || row.desc || '',
+    badge: row.badge || ''
+  }));
+  applyFilters();
+  updateSidebar();
+  populateFilters();
+}
+
+// ── FILTERS ──────────────────────────────────────────────
+function populateFilters() {
+  const marcas = [...new Set(adminProducts.map(p => p.marca).filter(Boolean))].sort();
+  const tipos  = [...new Set(adminProducts.map(p => p.tipo).filter(Boolean))].sort();
+  const fMarca = document.getElementById('filterMarca');
+  const fTipo  = document.getElementById('filterTipo');
+  fMarca.innerHTML = '<option value="">Todas as marcas</option>' + marcas.map(m => `<option>${escHtml(m)}</option>`).join('');
+  fTipo.innerHTML  = '<option value="">Todos os tipos</option>'  + tipos.map(t => `<option>${escHtml(t)}</option>`).join('');
+}
+
+function applyFilters() {
+  const q     = document.getElementById('searchInput')?.value.toLowerCase() || '';
+  const marca = document.getElementById('filterMarca')?.value || '';
+  const tipo  = document.getElementById('filterTipo')?.value || '';
+  filteredIndices = adminProducts
+    .map((p, i) => ({ p, i }))
+    .filter(({ p }) => {
+      const matchQ = !q || [p.nome, p.marca, p.liga, p.tipo, p.id].some(v => v.toLowerCase().includes(q));
+      const matchM = !marca || p.marca === marca;
+      const matchT = !tipo  || p.tipo  === tipo;
+      return matchQ && matchM && matchT;
+    })
+    .map(({ i }) => i);
+  renderTable();
+  document.getElementById('filteredCount').textContent =
+    filteredIndices.length === adminProducts.length
+      ? `${adminProducts.length} produtos`
+      : `${filteredIndices.length} de ${adminProducts.length}`;
+}
+
+function updateSidebar() {
+  document.getElementById('statCount').textContent = adminProducts.length;
+  updateProductSelectOptions();
+}
+
+// ── TABLE ────────────────────────────────────────────────
+function renderTable() {
+  const tbody = document.getElementById('adminBody');
+  tbody.innerHTML = '';
+  filteredIndices.forEach((realIdx, displayNum) => {
+    const p = adminProducts[realIdx];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="row-num">${displayNum + 1}</td>
+      <td><input data-index="${realIdx}" data-field="id" value="${escHtml(p.id)}" style="width:50px"></td>
+      <td><input data-index="${realIdx}" data-field="nome" value="${escHtml(p.nome)}"></td>
+      <td><input data-index="${realIdx}" data-field="marca" value="${escHtml(p.marca)}" style="width:90px"></td>
+      <td><input data-index="${realIdx}" data-field="tipo" value="${escHtml(p.tipo)}" style="width:80px"></td>
+      <td><input data-index="${realIdx}" data-field="liga" value="${escHtml(p.liga)}" style="width:80px"></td>
+      <td><input data-index="${realIdx}" data-field="preco_brl" value="${escHtml(p.preco_brl)}" style="width:70px"></td>
+      <td><input data-index="${realIdx}" data-field="preco_usa" value="${escHtml(p.preco_usa)}" style="width:70px"></td>
+      <td class="img-cell">
+        <input data-index="${realIdx}" data-field="img_1" value="${escHtml(p.img_1)}">
+        <img class="img-preview" src="${previewUrl(p.img_1)}" onerror="this.src='https://placehold.co/80x80/1e2229/7a8394?text=?'">
+      </td>
+      <td class="img-cell">
+        <input data-index="${realIdx}" data-field="img_2" value="${escHtml(p.img_2)}">
+        <img class="img-preview" src="${previewUrl(p.img_2)}" onerror="this.src='https://placehold.co/80x80/1e2229/7a8394?text=?'">
+      </td>
+      <td class="img-cell">
+        <input data-index="${realIdx}" data-field="img_3" value="${escHtml(p.img_3)}">
+        <img class="img-preview" src="${previewUrl(p.img_3)}" onerror="this.src='https://placehold.co/80x80/1e2229/7a8394?text=?'">
+      </td>
+      <td><textarea data-index="${realIdx}" data-field="tamanhos" rows="2">${escHtml(p.tamanhos)}</textarea></td>
+      <td><textarea data-index="${realIdx}" data-field="descricao" rows="2">${escHtml(p.descricao)}</textarea></td>
+      <td><input data-index="${realIdx}" data-field="badge" value="${escHtml(p.badge)}" style="width:80px">${p.badge ? `<span class="badge-chip">${escHtml(p.badge)}</span>` : ''}</td>
+      <td>
+        <button class="btn btn-sm btn-danger btn-delete" data-index="${realIdx}" title="Excluir produto">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  tbody.querySelectorAll('input[data-field], textarea[data-field]').forEach(el => {
+    el.addEventListener('input', handleInputChange);
+  });
+  tbody.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const idx = Number(e.currentTarget.dataset.index);
+      const name = adminProducts[idx]?.nome || `#${idx+1}`;
+      showConfirm('Excluir produto', `Tem certeza que deseja excluir "${name}"?`, () => deleteProduct(idx));
+    });
+  });
+}
+
+function handleInputChange(e) {
+  const idx   = Number(e.target.dataset.index);
+  const field = e.target.dataset.field;
+  if (!Number.isFinite(idx) || !field) return;
+  adminProducts[idx][field] = e.target.value;
+  if (field.startsWith('img_')) {
+    const img = e.target.nextElementSibling;
+    if (img?.tagName === 'IMG') img.src = previewUrl(e.target.value);
+  }
+}
+
+function addProduct() {
+  const maxId = adminProducts.length ? Math.max(...adminProducts.map(p => Number(p.id) || 0)) : 0;
+  adminProducts.push({
+    id: String(maxId + 1), nome: '', marca: '', tipo: '', liga: '',
+    preco_brl: '', preco_usa: '',
+    img_1: '', img_2: '', img_3: '',
+    tamanhos: '', descricao: '', badge: ''
+  });
+  // Clear search so new product is visible
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filterMarca').value = '';
+  document.getElementById('filterTipo').value = '';
+  applyFilters();
+  updateSidebar();
+  // Scroll to bottom of table
+  const wrap = document.querySelector('.table-wrap');
+  if (wrap) wrap.scrollTop = wrap.scrollHeight;
+  toast('Produto adicionado. Preencha os campos.');
+}
+
+function deleteProduct(idx) {
+  adminProducts.splice(idx, 1);
+  applyFilters();
+  updateSidebar();
+  populateFilters();
+  toast('Produto excluído.', 'error');
+}
+
+function updateProductSelectOptions() {
+  const sel = document.getElementById('selectProductRow');
+  if (!sel) return;
+  sel.innerHTML = adminProducts.map((p, i) =>
+    `<option value="${i}">${escHtml(`${i+1} – ${p.nome || 'Sem nome'}`)}</option>`
+  ).join('');
+}
+
+// ── IMAGES ───────────────────────────────────────────────
+function previewUrl(val) {
+  if (!val) return 'https://placehold.co/80x80/1e2229/7a8394?text=?';
+  return val.trim().startsWith('http') ? val.trim() : BASE_URL_FOTOS + encodeURI(val.trim());
+}
+
+const CF_ENDPOINT = 'https://api.cloudflare.com/client/v4/accounts';
+
+async function handleUploadImage() {
+  const statusEl = document.getElementById('uploadStatus');
+  const setStatus = (msg, cls = '') => {
+    statusEl.textContent = msg;
+    statusEl.className = 'upload-status ' + cls;
+  };
+
+  const file       = document.getElementById('imageFileUpload').files[0];
+  const accountId  = document.getElementById('cfAccountId').value.trim();
+  const bucketName = document.getElementById('cfBucketName').value.trim();
+  const baseUrl    = document.getElementById('cfR2BaseUrl').value.trim();
+  const apiToken   = document.getElementById('cfApiToken').value.trim();
+  const prodIdx    = Number(document.getElementById('selectProductRow').value);
+  const field      = document.getElementById('selectImageSlot').value;
+
+  if (!file)       return setStatus('Escolha um arquivo de imagem.', 'err');
+  if (!accountId || !bucketName || !apiToken)
+    return setStatus('Informe Account ID, Bucket Name e API Token.', 'err');
+  if (!['img_1','img_2','img_3'].includes(field))
+    return setStatus('Selecione um slot de imagem válido.', 'err');
+
+  setStatus('Enviando para Cloudflare R2…');
+  try {
+    const endpoint = `${CF_ENDPOINT}/${encodeURIComponent(accountId)}/r2/buckets/${encodeURIComponent(bucketName)}/objects/${encodeURIComponent(file.name)}`;
+    const res = await fetch(endpoint, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${apiToken}`, 'Content-Type': file.type || 'application/octet-stream' },
+      body: file
+    });
+    const result = await res.json();
+    if (!res.ok || !result.success)
+      throw new Error(result.errors?.map(e => e.message).join(', ') || 'Upload falhou');
+
+    const imageUrl = baseUrl
+      ? `${baseUrl.replace(/\/$/, '')}/${encodeURIComponent(file.name)}`
+      : `https://${accountId}.r2.cloudflarestorage.com/${bucketName}/${encodeURIComponent(file.name)}`;
+
+    adminProducts[prodIdx][field] = imageUrl;
+    setStatus(`✓ Imagem enviada! URL inserida em ${field} do produto ${prodIdx + 1}.`, 'ok');
+    toast('Upload concluído com sucesso!');
+    applyFilters();
+  } catch (err) {
+    setStatus(`Erro: ${err.message}`, 'err');
+    toast('Erro no upload: ' + err.message, 'error');
+  }
+}
+
+// ── EXPORT ───────────────────────────────────────────────
+function exportCsv() {
+  const csv = Papa.unparse(adminProducts, { quotes: true, delimiter: ',', header: true });
+  document.getElementById('csvOutput').value = csv;
+  downloadFile(csv, 'text/csv;charset=utf-8;', 'Tabela_Sport_Closet_2026.csv');
+  toast('CSV exportado e download iniciado!');
+  switchTab('exportar');
+}
+
+function exportJson() {
+  const json = JSON.stringify(adminProducts, null, 2);
+  document.getElementById('csvOutput').value = json;
+  downloadFile(json, 'application/json;charset=utf-8;', 'Tabela_Sport_Closet_2026.json');
+  toast('JSON exportado e download iniciado!');
+  switchTab('exportar');
+}
+
+function downloadFile(text, mimeType, filename) {
+  const blob = new Blob([text], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function copyOutput() {
+  const out = document.getElementById('csvOutput').value;
+  if (!out) { toast('Gere uma exportação antes de copiar.', 'error'); return; }
+  navigator.clipboard.writeText(out)
+    .then(() => toast('Saída copiada!'))
+    .catch(() => toast('Não foi possível copiar.', 'error'));
+}
+
+function importCsvFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const result = Papa.parse(e.target.result, { header: true, skipEmptyLines: true });
+    loadProducts(result.data);
+    toast(`${result.data.length} produtos importados com sucesso!`);
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+// ── TABS ─────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.getElementById('topBarTitle').textContent =
+    name === 'produtos' ? 'Produtos' : name === 'upload' ? 'Upload para Cloudflare R2' : 'Exportar / Saída';
+}
+
+// ── HELPERS ──────────────────────────────────────────────
+function escHtml(v) {
+  return String(v ?? '').replace(/[&<>"]/g, m =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])
+  );
+}
+
+function togglePass(inputId, btnId) {
+  const inp = document.getElementById(inputId);
+  const btn = document.getElementById(btnId);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.title = inp.type === 'password' ? 'Mostrar' : 'Ocultar';
+}
+
+// ── INIT ─────────────────────────────────────────────────
+function initAdmin() {
+  // Tabs
+  document.querySelectorAll('.tab-btn, .nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  // Buttons
+  document.getElementById('btnAdd').addEventListener('click', addProduct);
+  document.getElementById('btnExport').addEventListener('click', exportCsv);
+  document.getElementById('btnExportJson').addEventListener('click', exportJson);
+  document.getElementById('btnCopy').addEventListener('click', copyOutput);
+  document.getElementById('btnUploadImage').addEventListener('click', handleUploadImage);
+  document.getElementById('btnLogout').addEventListener('click', () => {
+    showConfirm('Sair do Admin', 'Deseja encerrar a sessão?', () => {
+      setAuth(false);
+      location.reload();
+    });
+  });
+
+  // Import
+  const csvImport = document.getElementById('csvImport');
+  document.getElementById('btnImport').addEventListener('click', () => csvImport.click());
+  csvImport.addEventListener('change', e => { if (e.target.files[0]) importCsvFile(e.target.files[0]); });
+
+  // Filters
+  document.getElementById('searchInput').addEventListener('input', applyFilters);
+  document.getElementById('filterMarca').addEventListener('change', applyFilters);
+  document.getElementById('filterTipo').addEventListener('change', applyFilters);
+
+  // Confirm dialog
+  document.getElementById('confirmCancel').addEventListener('click', () => {
+    document.getElementById('confirmDialog').classList.remove('open');
+  });
+
+  // Password toggles
+  document.getElementById('passToggle').addEventListener('click', () => togglePass('adminPasswordInput', 'passToggle'));
+  document.getElementById('cfTokenToggle')?.addEventListener('click', () => togglePass('cfApiToken', 'cfTokenToggle'));
+
+  fetchCsv();
+}
+
+function initAuth() {
+  document.getElementById('adminLoginBtn').addEventListener('click', handleLogin);
+  document.getElementById('adminPasswordInput').addEventListener('keyup', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+  if (isAuth()) {
+    document.getElementById('authOverlay').style.display = 'none';
+    initAdmin();
+  }
+}
+
+window.addEventListener('DOMContentLoaded', initAuth);
+</script>
 </body>
 </html>
