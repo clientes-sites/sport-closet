@@ -155,11 +155,13 @@ nav {
 .insta-circle {
   display: flex !important;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   text-decoration: none;
   margin-top: 5px;
   transition: transform 0.3s ease;
+  width: fit-content;
 }
+
 
 .insta-circle img {
   width: 28px;
