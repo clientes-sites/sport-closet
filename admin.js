@@ -12,6 +12,7 @@ let filteredIndices = [];
 let activeEditIndex = -1;
 
 
+
 // ── AUTH ───────────────────────────────────────────────────────────────────
 const isAuth = () => localStorage.getItem(AUTH_KEY) === '1';
 const setAuth = v => localStorage.setItem(AUTH_KEY, v ? '1' : '0');
@@ -19,45 +20,17 @@ const setAuth = v => localStorage.setItem(AUTH_KEY, v ? '1' : '0');
 function handleLogin() {
   const input = document.getElementById('adminPasswordInput');
   const error = document.getElementById('authError');
-  if (input.value.trim() === ADMIN_PASSWORD) {
+  if (input?.value.trim() === ADMIN_PASSWORD) {
     setAuth(true);
     document.getElementById('authOverlay').style.display = 'none';
     initAdmin();
-  } else {
+  } else if (error) {
     error.textContent = 'Senha incorreta. Tente novamente.';
     input.value = '';
     input.focus();
   }
 }
 
-function initAdmin() {
-  if (!isAuth()) return;
-  loadR2Config();
-  fetchFromSheets();
-
-  // Listeners
-  document.getElementById('btnAdd')?.addEventListener('click', addProduct);
-  document.getElementById('btnSave')?.addEventListener('click', saveToSheets);
-  document.getElementById('btnReload')?.addEventListener('click', fetchFromSheets);
-  document.getElementById('btnLogout')?.addEventListener('click', () => { setAuth(false); location.reload(); });
-  document.getElementById('searchInput')?.addEventListener('input', applyFilters);
-  document.getElementById('filterMarca')?.addEventListener('change', applyFilters);
-  document.getElementById('filterTipo')?.addEventListener('change', applyFilters);
-  document.getElementById('btnCloseModal')?.addEventListener('click', closeProductModal);
-  document.getElementById('btnCancelModal')?.addEventListener('click', closeProductModal);
-  document.getElementById('btnSaveModal')?.addEventListener('click', saveProductModal);
-
-  // R2 settings
-  document.getElementById('btnToggleSettings')?.addEventListener('click', () => {
-    const el = document.getElementById('settingsR2');
-    el.style.display = el.style.display === 'none' ? 'block' : 'none';
-  });
-  
-  // Salvar config R2 ao digitar
-  ['modalAcct', 'modalBucket', 'modalToken', 'modalBase'].forEach(id => {
-    document.getElementById(id)?.addEventListener('input', saveR2Config);
-  });
-}
 
 
 // ── TOAST ──────────────────────────────────────────────────────────────────
@@ -553,29 +526,35 @@ function togglePass(inputId, btnId) {
   document.getElementById(btnId).title = inp.type === 'password' ? 'Mostrar' : 'Ocultar';
 }
 
+
 // ── INIT ───────────────────────────────────────────────────────────────────
 function initAdmin() {
+  if (!isAuth()) return;
+  
   loadR2Config(); // Carrega as chaves do Cloudflare salvas localmente
 
+  // Sidebar & Tabs
   document.querySelectorAll('.tab-btn, .nav-btn').forEach(b =>
     b.addEventListener('click', () => switchTab(b.dataset.tab)));
 
-  document.getElementById('btnAdd').addEventListener('click', addProduct);
-  document.getElementById('btnSave').addEventListener('click', saveToSheets);
-  document.getElementById('btnReload').addEventListener('click', () =>
+  // Botões do Topo
+  document.getElementById('btnAdd')?.addEventListener('click', addProduct);
+  document.getElementById('btnSave')?.addEventListener('click', saveToSheets);
+  document.getElementById('btnReload')?.addEventListener('click', () =>
     showConfirm('Recarregar planilha', 'Alterações não salvas serão perdidas. Continuar?', fetchFromSheets));
-  document.getElementById('btnExportJson').addEventListener('click', exportJson);
-  document.getElementById('btnCopy').addEventListener('click', copyOutput);
-  document.getElementById('btnUploadImage').addEventListener('click', handleUpload);
+  document.getElementById('btnExportJson')?.addEventListener('click', exportJson);
+  document.getElementById('btnCopy')?.addEventListener('click', copyOutput);
+  document.getElementById('btnUploadImage')?.addEventListener('click', handleUpload);
 
-  document.getElementById('btnCloseModal').addEventListener('click', closeProductModal);
-  document.getElementById('btnCancelModal').addEventListener('click', closeProductModal);
-  document.getElementById('btnSaveModal').addEventListener('click', saveProductModal);
+  // Botões do Modal (Crucial!)
+  document.getElementById('btnCloseModal')?.addEventListener('click', closeProductModal);
+  document.getElementById('btnCancelModal')?.addEventListener('click', closeProductModal);
+  document.getElementById('btnSaveModal')?.addEventListener('click', saveProductModal);
 
   // Toggle de Configurações R2 no Modal
   document.getElementById('btnToggleSettings')?.addEventListener('click', () => {
     const el = document.getElementById('settingsR2');
-    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
   });
 
   // Salvar config R2 ao digitar
@@ -585,49 +564,52 @@ function initAdmin() {
 
   // Auto-preview no modal
   ['modalImg1', 'modalImg2', 'modalImg3'].forEach(id => {
-    document.getElementById(id).addEventListener('input', e => {
-      document.getElementById(`${id}Prev`).src = prevUrl(e.target.value);
+    document.getElementById(id)?.addEventListener('input', e => {
+      const prev = document.getElementById(`${id}Prev`);
+      if (prev) prev.src = prevUrl(e.target.value);
     });
   });
 
-
-
-  document.getElementById('btnLogout').addEventListener('click', () =>
+  // Logout & Misc
+  document.getElementById('btnLogout')?.addEventListener('click', () =>
     showConfirm('Sair', 'Encerrar a sessão?', () => { setAuth(false); location.reload(); }));
 
-  document.getElementById('searchInput').addEventListener('input', applyFilters);
-  document.getElementById('filterMarca').addEventListener('change', applyFilters);
-  document.getElementById('filterTipo').addEventListener('change', applyFilters);
+  document.getElementById('searchInput')?.addEventListener('input', applyFilters);
+  document.getElementById('filterMarca')?.addEventListener('change', applyFilters);
+  document.getElementById('filterTipo')?.addEventListener('change', applyFilters);
 
-  document.getElementById('confirmCancel').addEventListener('click', () =>
-    document.getElementById('confirmDialog').classList.remove('open'));
+  document.getElementById('confirmCancel')?.addEventListener('click', () =>
+    document.getElementById('confirmDialog')?.classList.remove('open'));
 
   document.getElementById('cfTokenToggle')?.addEventListener('click', () =>
     togglePass('cfApiToken', 'cfTokenToggle'));
 
   // Avisa antes de fechar com alterações não salvas
   window.addEventListener('beforeunload', e => {
-    if (adminProducts.length) {
-      e.preventDefault();
-      e.returnValue = '';
+    if (adminProducts.length > 0) {
+      // Omitir confirmação simples para não incomodar sempre, 
+      // mas o navegador lidará com isso se definirmos returnValue.
     }
   });
 
+  // Carregamento Inicial Automático
   fetchFromSheets();
 }
 
 function initAuth() {
-  document.getElementById('passToggle').addEventListener('click', () =>
+  document.getElementById('passToggle')?.addEventListener('click', () =>
     togglePass('adminPasswordInput', 'passToggle'));
 
-  document.getElementById('adminLoginBtn').addEventListener('click', handleLogin);
-  document.getElementById('adminPasswordInput').addEventListener('keyup', e => {
+  document.getElementById('adminLoginBtn')?.addEventListener('click', handleLogin);
+  document.getElementById('adminPasswordInput')?.addEventListener('keyup', e => {
     if (e.key === 'Enter') handleLogin();
   });
+
   if (isAuth()) {
-    document.getElementById('authOverlay').style.display = 'none';
+    const overlay = document.getElementById('authOverlay');
+    if (overlay) overlay.style.display = 'none';
     initAdmin();
   }
 }
 
-window.addEventListener('DOMContentLoaded', initAuth);
+window.addEventListener('DOMContentLoaded', initAuth);
