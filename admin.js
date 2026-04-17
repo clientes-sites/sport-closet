@@ -145,6 +145,7 @@ function loadProducts(rows) {
     marca: row.marca || '',
     tipo: row.tipo || '',
     liga: row.liga || '',
+    modelo: row.modelo || row.model || row.colecao || '',
     preco_brl: row.preco_brl || row.preco_br || row.preco || '',
     preco_usa: row.preco_usa || row.preco_usd || row.usd || '',
     img_1: row.img_1 || '',
@@ -180,6 +181,7 @@ function openProductModal(idx) {
   document.getElementById('modalMarca').value = p.marca || '';
   document.getElementById('modalTipo').value = p.tipo || '';
   document.getElementById('modalLiga').value = p.liga || '';
+  document.getElementById('modalModelo').value = p.modelo || '';
   document.getElementById('modalBadge').value = p.badge || '';
   document.getElementById('modalPrecoBrl').value = p.preco_brl || '';
   document.getElementById('modalPrecoUsa').value = p.preco_usa || '';
@@ -219,6 +221,7 @@ function saveProductModal() {
   p.marca = document.getElementById('modalMarca').value;
   p.tipo = document.getElementById('modalTipo').value;
   p.liga = document.getElementById('modalLiga').value;
+  p.modelo = document.getElementById('modalModelo').value;
   p.badge = document.getElementById('modalBadge').value;
   p.preco_brl = document.getElementById('modalPrecoBrl').value;
   p.preco_usa = document.getElementById('modalPrecoUsa').value;
@@ -296,6 +299,7 @@ function renderTable() {
       <td class="col-marca">${esc(p.marca)}</td>
       <td class="col-tipo">${esc(p.tipo)}</td>
       <td class="col-liga">${esc(p.liga)}</td>
+      <td class="col-modelo">${esc(p.modelo)}</td>
       <td class="col-preco">${esc(p.preco_brl)}</td>
       <td class="col-preco">${esc(p.preco_usa)}</td>
       <td class="img-cell">
@@ -369,7 +373,7 @@ function addProduct() {
     ? Math.max(...adminProducts.map(p => Number(p.id) || 0)) : 0;
   
   const newProduct = {
-    id: String(maxId + 1), nome: '', marca: '', tipo: '', liga: '',
+    id: String(maxId + 1), nome: '', marca: '', tipo: '', liga: '', modelo: '',
     preco_brl: '', preco_usa: '',
     img_1: '', img_2: '', img_3: '',
     tamanhos: '', descricao: '', badge: ''

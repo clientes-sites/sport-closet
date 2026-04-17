@@ -9,7 +9,7 @@ const pageName = (path === '' || path === 'index.html') ? 'index' : path.replace
 
 const pageTypeMap = {
     'copa2026': 'camisa de seleção',
-    'roupas-verao': ['camiseta', 'shorts', 'regata', 'casaco', 'legging', 'roupa - verão', 'roupa - verao'],
+    'roupas-verao': ['camiseta', 'shorts', 'regata', 'casaco', 'legging', 'roupa - verão', 'roupa - verao', 'bermuda', 'bone', 'chinelo', 'meia'],
     'camisas': 'camisa de time',
     'tenis': 'tênis'
 };
@@ -291,6 +291,12 @@ const wppSvg = `<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.75
 /* ─── FILTROS E BUSCA ───────────────────────────────────────────────────── */
 function setFilter(group, value) {
   activeFilters[group] = value.toLowerCase();
+  
+  // Se mudar a MARCA, resetamos a PEÇA (modelo) para evitar filtros conflitantes
+  if (group === 'marca') {
+    activeFilters.peca = 'todos';
+  }
+
   document.querySelectorAll(`.fb[data-g="${group}"]`).forEach(b => {
     b.classList.toggle('active', norm(b.dataset.v) === norm(value));
   });
@@ -576,8 +582,11 @@ function renderGrid() {
                          pMarca.includes(searchQuery) || 
                          pTipo.includes(searchQuery) || 
                          pLiga.includes(searchQuery);
+      
+      const pModelo = norm(p.modelo);
+      const matchPecaFilter = activeFilters.peca === 'todos' || pModelo === norm(activeFilters.peca);
 
-      return matchPageType && matchLigaFilter && matchMarcaFilter && matchCopaSponsor && matchBusca;
+      return matchPageType && matchLigaFilter && matchMarcaFilter && matchCopaSponsor && matchBusca && matchPecaFilter;
     });
 
     const targetGrid = pageName === 'index' ? 'grid-drop-exclusivo' : 'grid';
@@ -590,9 +599,72 @@ function renderGrid() {
         if (grid2) grid2.innerHTML = '';
     }
 
-    // Atualiza visibilidade dos botões de filtro
+    // Re-renderiza filtros dinâmicos de modelos/peças
+    if (pageName === 'tenis' || pageName === 'roupas-verao' || pageName === 'camisas') {
+        const type = (pageName === 'tenis' || pageName === 'roupas-verao') ? 'marca' : 'liga';
+        const label = type === 'marca' ? 'Marcas' : 'Ligas';
+        
+        // Renderiza Marcas ou Ligas
+        updateDynamicFilters(`dynamic${label}Filters`, type, type, list);
+        
+        // Renderiza Modelos/Peças (apenas para tênis e roupas verao)
+        if (pageName !== 'camisas') {
+            updateDynamicFilters(pageName === 'tenis' ? 'dynamicModelFilters' : 'dynamicPieceFilters', 'peca', 'modelo', list);
+        }
+    }
+
+    // Atualiza visibilidade dos botões de filtro (para os que ainda forem estáticos, se houver)
     refreshFilterVisibility(list);
   }
+}
+
+/**
+ * Gera dinamicamente os botões de filtro com base nos produtos atuais.
+ * @param {string} containerId ID do container no HTML
+ * @param {string} filterGroup O grupo (data-g) do filtro (ex: marca, peca, liga)
+ * @param {string} productField O campo no objeto produto (ex: marca, modelo, liga)
+ * @param {Array} filteredList A lista de produtos passada para o filtro
+ */
+function updateDynamicFilters(containerId, filterGroup, productField, filteredList) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // 1. Pegar todos os valores únicos que NÃO estão vazios para este campo
+    const valuesSet = new Set();
+    
+    // Para filtros de nível secundário (peca/modelo), filtramos apenas os que batem com a MARCA selecionada
+    // Ja para filtros de nível primário (marca/liga), olhamos todos os produtos da página
+    filteredList.forEach(p => {
+        const val = p[productField];
+        if (val && val.trim()) {
+            // Se for modelo, só adiciona se bater com a marca ativa (ou se não houver marca ativa)
+            if (filterGroup === 'peca' && activeFilters.marca !== 'todos' && norm(p.marca) !== norm(activeFilters.marca)) return;
+            
+            valuesSet.add(val.trim().toLowerCase());
+        }
+    });
+
+    const values = Array.from(valuesSet).sort();
+
+    // 2. Preservar o botão "TODOS"
+    const todosBtn = container.querySelector(`.fb[data-v="todos"], .fp[data-v="todos"]`);
+    container.innerHTML = '';
+    if (todosBtn) {
+        container.appendChild(todosBtn);
+        todosBtn.classList.toggle('active', activeFilters[filterGroup] === 'todos');
+    }
+
+    // 3. Criar novos botões
+    values.forEach(v => {
+        const btn = document.createElement('button');
+        btn.className = 'fb';
+        if (activeFilters[filterGroup] === v) btn.classList.add('active');
+        btn.dataset.g = filterGroup;
+        btn.dataset.v = v;
+        btn.textContent = v.toUpperCase();
+        btn.onclick = () => setFilter(filterGroup, v);
+        container.appendChild(btn);
+    });
 }
 
 /** 
@@ -632,6 +704,31 @@ function refreshFilterVisibility(filteredList) {
         setFilter(group, 'todos');
       }
     });
+  });
+
+  // Visibilidade de Filtros de Peças/Modelos (Customizado por página)
+  const pecaButtons = document.querySelectorAll('.fb[data-g="peca"], .fp[data-g="peca"]');
+  pecaButtons.forEach(btn => {
+    const val = norm(btn.dataset.v);
+    if (val === 'todos') return;
+
+    const exists = allProds.some(p => {
+      // Deve respeitar a página e a marca já selecionada
+      let matchPage = false;
+      if (pageName === 'index') matchPage = true;
+      else if (Array.isArray(pageType)) matchPage = pageType.map(pt => norm(pt)).includes(norm(p.tipo));
+      else matchPage = norm(p.tipo) === norm(pageType);
+
+      if (!matchPage) return false;
+
+      // Respeita a marca selecionada (se houver) para filtrar modelos relevantes
+      if (activeFilters.marca !== 'todos' && norm(p.marca) !== norm(activeFilters.marca)) return false;
+
+      return norm(p.modelo) === val;
+    });
+
+    btn.style.display = exists ? 'inline-block' : 'none';
+    if (!exists && activeFilters.peca === val) setFilter('peca', 'todos');
   });
 }
 
@@ -883,6 +980,7 @@ function processCSVData(data) {
       marca: norm(row.marca),
       tipo: norm(row.tipo),
       liga: norm(row.liga),
+      modelo: norm(row.modelo || row.model || row.colecao),
       brl: parseFloat((row.preco_brl || '0').replace(',', '.')) || 0,
       usd: parseFloat((row.preco_usa || '0').replace(',', '.')) || 0,
       tamanhos: tamanhos,

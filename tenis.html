@@ -28,11 +28,15 @@
   <div class="filter-section">
     <div class="section-title">OS MELHORES <span>TÊNIS</span></div>
     <div class="fg-label">Filtrar por Marca:</div>
-    <div class="filter-group">
+    <div class="filter-group" id="dynamicBrandFilters">
         <button class="fb active" data-g="marca" data-v="todos" onclick="setFilter('marca','todos')">TODAS</button>
-        <button class="fb" data-g="marca" data-v="nike" onclick="setFilter('marca','nike')">NIKE</button>
-        <button class="fb" data-g="marca" data-v="adidas" onclick="setFilter('marca','adidas')">ADIDAS</button>
-        <button class="fb" data-g="marca" data-v="new balance" onclick="setFilter('marca','new balance')">NEW BALANCE</button>
+        <!-- Injetado dinamicamente via loja.js -->
+    </div>
+
+    <div class="fg-label" style="margin-top:20px">Filtrar por Modelo:</div>
+    <div class="filter-group" id="dynamicModelFilters">
+        <button class="fb active" data-g="peca" data-v="todos" onclick="setFilter('peca','todos')">TODOS</button>
+        <!-- Injetado dinamicamente via loja.js -->
     </div>
   </div>
 
