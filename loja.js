@@ -925,6 +925,7 @@ function init() {
 
 /* ─── CARREGAMENTO DOS DADOS DO CSV LOCAL ──────────────────────────────── */
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTJJsi5MlreQayUKZtiZIwb0RcZCPa5ngJOkOmq-uCkKvtxVD8oRvYIJuYosn-22qsXtCsZsHJHfjhs/pub?output=csv';
+const BASE_URL_FOTOS = 'https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/';
 
 function bootStore() {
   document.body.classList.add('is-loading');
@@ -986,7 +987,13 @@ function processCSVData(data) {
       tamanhos: tamanhos,
       desc: row.descricao || '',
       badge: row.badge || '',
-      imgs: [row.img_1, row.img_2, row.img_3].filter(img => img && img.trim())
+      imgs: [row.img_1, row.img_2, row.img_3]
+            .filter(img => img && img.trim())
+            .map(img => {
+                const clean = img.trim();
+                if (clean.startsWith('http')) return clean;
+                return BASE_URL_FOTOS + clean;
+            })
     };
   }).filter(p => p.nome);
 }
