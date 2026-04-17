@@ -1872,3 +1872,18 @@ body:not(.home) .slider-dots {
 body:not(.home) .slide-content {
   pointer-events: auto;
 }
+
+/* ── ESTILOS GLOBAIS (LEGACY) ── */
+.nav-logo-link {
+    text-decoration: none;
+}
+.logo-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+}
+footer .logo-text {
+    font-size: 20px;
+}
