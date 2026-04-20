@@ -602,7 +602,7 @@ function renderGrid() {
     // Re-renderiza filtros dinâmicos de modelos/peças
     if (pageName === 'tenis' || pageName === 'roupas-verao' || pageName === 'camisas') {
         const type = (pageName === 'tenis' || pageName === 'roupas-verao') ? 'marca' : 'liga';
-        const label = type === 'marca' ? 'Marcas' : 'Ligas';
+        const label = type === 'marca' ? 'Marca' : 'Liga';
         
         // Renderiza Marcas ou Ligas
         updateDynamicFilters(`dynamic${label}Filters`, type, type, list);
@@ -748,7 +748,7 @@ function desenharCards(containerId, lista) {
   }
 
   grid.innerHTML = lista.map(p => {
-    const fotoUrl = p.imgs && p.imgs[0] ? encodeURI(BASE_URL_FOTOS + p.imgs[0]) : 'https://placehold.co/400x500?text=Foto+Indisponível';
+    const fotoUrl = p.imgs && p.imgs[0] ? encodeURI(p.imgs[0]) : 'https://placehold.co/400x500?text=Foto+Indisponível';
     return `
     <div class="card" onclick="openModal(${p.id})">
       <div class="card-img">
@@ -833,7 +833,7 @@ function closeModal(e) {
 function renderCarousel() {
   const track = document.getElementById('carouselTrack');
   track.innerHTML = carouselImgs.map((img, i) => `
-    <div class="carousel-slide"><img src="${encodeURI(BASE_URL_FOTOS + img)}" loading="${i === 0 ? 'eager' : 'lazy'}"></div>`).join('');
+    <div class="carousel-slide"><img src="${encodeURI(img)}" loading="${i === 0 ? 'eager' : 'lazy'}"></div>`).join('');
   
   const dots = document.getElementById('carouselDots');
   dots.innerHTML = carouselImgs.length > 1 ? carouselImgs.map((_, i) => `<span class="carousel-dot${i === 0 ? ' active' : ''}" onclick="carouselGoTo(${i})"></span>`).join('') : '';
@@ -925,46 +925,56 @@ function init() {
 
 /* ─── CARREGAMENTO DOS DADOS DO CSV LOCAL ──────────────────────────────── */
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTJJsi5MlreQayUKZtiZIwb0RcZCPa5ngJOkOmq-uCkKvtxVD8oRvYIJuYosn-22qsXtCsZsHJHfjhs/pub?output=csv';
-const BASE_URL_FOTOS = 'https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/';
+
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw0KrdBrG0Afz4LmUjFL3adH-5AXvlCgQk2fkaWPJpIb-c9wGbo-XzHPTKkTpn5OkR_Rg/exec';
 
 function bootStore() {
   document.body.classList.add('is-loading');
-  const sc = document.createElement('script');
-  sc.src = "https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js";
-  sc.onload = () => {
-    fetch(GOOGLE_SHEET_CSV_URL)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.text();
-      })
-      .then(csvText => {
-        Papa.parse(csvText, {
+  
+  // Tenta o Apps Script primeiro (como no admin.js)
+  fetch(APPS_SCRIPT_URL)
+    .then(res => res.json())
+    .then(json => {
+      if (json.ok && json.data && json.data.length > 0) {
+        processCSVData(json.data);
+        init();
+      } else {
+        throw new Error("Apps Script sem dados");
+      }
+    })
+    .catch(err => {
+      console.warn("Apps Script falhou ou vazio. Tentando CSV fallback...", err);
+      // Fallback para PapaParse via script
+      const sc = document.createElement('script');
+      sc.src = "https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js";
+      sc.onload = () => {
+        Papa.parse(GOOGLE_SHEET_CSV_URL, {
+          download: true,
           header: true,
           skipEmptyLines: true,
           complete: function(results) {
-            processCSVData(results.data);
-            init();
+            if (results.data && results.data.length > 0) {
+              processCSVData(results.data);
+              init();
+            } else {
+              loadFallbackCsv();
+            }
           },
           error: function(err) {
-            console.error("Erro ao parsear CSV do Google Sheets:", err);
+            console.error("Erro ao baixar CSV:", err);
             loadFallbackCsv();
           }
         });
-      })
-      .catch(err => {
-        console.warn("Não foi possível carregar o Google Sheets. Usando CSV local como fallback.", err);
-        loadFallbackCsv();
-      });
-  };
-  document.head.appendChild(sc);
+      };
+      sc.onerror = () => loadFallbackCsv();
+      document.head.appendChild(sc);
+    });
 }
 
 function loadFallbackCsv() {
-  console.error("Não foi possível carregar os produtos do Google Sheets e o CSV local foi removido.");
-  const grid = document.getElementById('grid');
-  if(grid) grid.innerHTML = '<div class="empty">Erro ao carregar produtos. Verifique o console.</div>';
+  console.error("Erro total ao carregar dados.");
+  const grid = document.getElementById('grid') || document.getElementById('grid-drop-exclusivo');
+  if(grid) grid.innerHTML = '<div class="empty">Erro ao carregar produtos. Verifique sua conexão.</div>';
   window.produtos = [];
   init();
 }
