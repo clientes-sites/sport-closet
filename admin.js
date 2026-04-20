@@ -71,6 +71,8 @@ function setLoading(active, msg = '') {
 // ── BUSCAR DADOS DO GOOGLE SHEETS ──────────────────────────────────────────
 async function fetchFromSheets() {
   setLoading(false, 'Carregando dados…');
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) overlay.style.display = 'flex';
   try {
     const res = await fetch(APPS_SCRIPT_URL);
     const json = await res.json();
@@ -100,6 +102,8 @@ async function fetchFromSheets() {
     console.error(err);
     setLoading(false, '');
     toast('Erro ao carregar dados: ' + err.message, 'error');
+  } finally {
+    if (overlay) overlay.style.display = 'none';
   }
 }
 
@@ -153,7 +157,8 @@ function loadProducts(rows) {
     img_3: row.img_3 || '',
     tamanhos: row.tamanhos || row.sizes || '',
     descricao: row.descricao || row.desc || '',
-    badge: row.badge || ''
+    badge: row.badge || '',
+    status: norm(row.status) || 'ativo'
   }));
   populateFilters();
   applyFilters();
@@ -317,13 +322,14 @@ function renderTable() {
         ${p.badge ? `<span class="badge-chip">${esc(p.badge)}</span>` : ''}
       </td>
       <td>
+        ${p.status === 'arquivado' ? `<span class="status-chip archived">Arquivado</span>` : `<span class="status-chip active">Ativo</span>`}
+      </td>
+      <td>
         <div style="display:flex; gap:5px;" onclick="event.stopPropagation()">
-          <button class="btn btn-sm btn-danger btn-del" data-i="${ri}" title="Excluir">
+          <button class="btn btn-sm ${p.status === 'arquivado' ? 'btn-primary' : 'btn-danger'} btn-arch" data-i="${ri}" title="${p.status === 'arquivado' ? 'Desarquivar' : 'Arquivar'}">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"/>
-              <path d="M19 6l-1 14H6L5 6"/>
-              <path d="M9 6V4h6v2"/>
+              <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
             </svg>
           </button>
         </div>
@@ -342,12 +348,11 @@ function renderTable() {
       openProductModal(idx);
     }));
 
-  tbody.querySelectorAll('.btn-del').forEach(btn =>
+  tbody.querySelectorAll('.btn-arch').forEach(btn =>
     btn.addEventListener('click', e => {
-      e.stopPropagation(); // Evita abrir o modal ao deletar
+      e.stopPropagation();
       const idx = Number(e.currentTarget.dataset.i);
-      const name = adminProducts[idx]?.nome || `#${idx + 1}`;
-      showConfirm('Excluir produto', `Deseja excluir "${name}"?`, () => deleteProduct(idx));
+      toggleArchiveProduct(idx);
     }));
 }
 
@@ -376,7 +381,7 @@ function addProduct() {
     id: String(maxId + 1), nome: '', marca: '', tipo: '', liga: '', modelo: '',
     preco_brl: '', preco_usa: '',
     img_1: '', img_2: '', img_3: '',
-    tamanhos: '', descricao: '', badge: ''
+    tamanhos: '', descricao: '', badge: '', status: 'ativo'
   };
 
   adminProducts.push(newProduct);
@@ -396,6 +401,15 @@ function deleteProduct(idx) {
   updateSidebar();
   populateFilters();
   toast('Produto removido. Clique em "Salvar no Sheets" para confirmar.', 'error');
+}
+
+function toggleArchiveProduct(idx) {
+  const p = adminProducts[idx];
+  p.status = p.status === 'arquivado' ? 'ativo' : 'arquivado';
+  applyFilters();
+  updateSidebar();
+  populateFilters();
+  toast(`Produto marcado como ${p.status}. Clique em "Salvar no Sheets".`, p.status === 'ativo' ? 'success' : 'error');
 }
 
 function prevUrl(val) {

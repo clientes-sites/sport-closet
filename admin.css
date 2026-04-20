@@ -477,3 +477,9 @@ table.prod-table td textarea:focus { border-color: var(--accent); background: va
   .top-bar { padding: 0 16px; }
   .panel   { padding: 16px; }
 }
+
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.status-chip { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+.status-chip.active { background: #e0f2f1; color: #00695c; }
+.status-chip.archived { background: #eeeeee; color: #616161; }
+

@@ -1003,9 +1003,10 @@ function processCSVData(data) {
                 const clean = img.trim();
                 if (clean.startsWith('http')) return clean;
                 return BASE_URL_FOTOS + clean;
-            })
+            }),
+      status: norm(row.status || 'ativo')
     };
-  }).filter(p => p.nome);
+  }).filter(p => p.nome && p.status !== 'arquivado');
 }
 
 /* ─── LOGICA DO SLIDER DE TIMES (HOME) ────────────────────────────────────── */
