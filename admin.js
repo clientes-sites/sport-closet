@@ -562,7 +562,6 @@ function initAdmin() {
     showConfirm('Recarregar planilha', 'Alterações não salvas serão perdidas. Continuar?', fetchFromSheets));
   document.getElementById('btnExportJson')?.addEventListener('click', exportJson);
   document.getElementById('btnCopy')?.addEventListener('click', copyOutput);
-  document.getElementById('btnUploadImage')?.addEventListener('click', handleUpload);
 
   // Botões do Modal (Crucial!)
   document.getElementById('btnCloseModal')?.addEventListener('click', closeProductModal);

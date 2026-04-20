@@ -584,7 +584,7 @@ function renderGrid() {
                          pLiga.includes(searchQuery);
       
       const pModelo = norm(p.modelo);
-      const matchPecaFilter = activeFilters.peca === 'todos' || pModelo === norm(activeFilters.peca);
+      const matchPecaFilter = activeFilters.peca === 'todos' || (pageName === 'roupas-verao' ? pTipo === norm(activeFilters.peca) : pModelo === norm(activeFilters.peca));
 
       return matchPageType && matchLigaFilter && matchMarcaFilter && matchCopaSponsor && matchBusca && matchPecaFilter;
     });
@@ -599,21 +599,39 @@ function renderGrid() {
         if (grid2) grid2.innerHTML = '';
     }
 
-    // Re-renderiza filtros dinâmicos de modelos/peças
-    if (pageName === 'tenis' || pageName === 'roupas-verao' || pageName === 'camisas') {
-        const type = (pageName === 'tenis' || pageName === 'roupas-verao') ? 'marca' : 'liga';
-        const label = type === 'marca' ? 'Marca' : 'Liga';
-        
-        // Renderiza Marcas ou Ligas
-        updateDynamicFilters(`dynamic${label}Filters`, type, type, list);
-        
-        // Renderiza Modelos/Peças (apenas para tênis e roupas verao)
-        if (pageName !== 'camisas') {
-            updateDynamicFilters(pageName === 'tenis' ? 'dynamicModelFilters' : 'dynamicPieceFilters', 'peca', 'modelo', list);
+    // -- LOGIC FOR DYNAMIC FILTERS --
+    if (['tenis', 'roupas-verao', 'camisas'].includes(pageName)) {
+        // Compute base page products completely unfiltered
+        const baseList = source.filter(p => {
+          const pTipo = norm(p.tipo);
+          let matchPageType = false;
+          if (pageType === 'todos' || pageName === 'index') {
+              matchPageType = true;
+          } else if (Array.isArray(pageType)) {
+              matchPageType = pageType.map(pt => norm(pt)).includes(pTipo);
+          } else {
+              matchPageType = pTipo === norm(pageType);
+          }
+          const matchBusca = !searchQuery || 
+                           norm(p.nome).includes(searchQuery) || 
+                           norm(p.marca).includes(searchQuery) || 
+                           pTipo.includes(searchQuery) || 
+                           norm(p.liga).includes(searchQuery);
+          return matchPageType && matchBusca;
+        });
+
+        if (pageName === 'camisas') {
+            updateDynamicFilters('dynamicLigaFilters', 'liga', 'liga', baseList);
+            updateDynamicFilters('dynamicMarcaFilters', 'marca', 'marca', baseList);
+        } else if (pageName === 'tenis') {
+            updateDynamicFilters('dynamicBrandFilters', 'marca', 'marca', baseList);
+            updateDynamicFilters('dynamicModelFilters', 'peca', 'modelo', list);
+        } else if (pageName === 'roupas-verao') {
+            updateDynamicFilters('dynamicBrandFilters', 'marca', 'marca', baseList);
+            updateDynamicFilters('dynamicPieceFilters', 'peca', 'tipo', list);
         }
     }
 
-    // Atualiza visibilidade dos botões de filtro (para os que ainda forem estáticos, se houver)
     refreshFilterVisibility(list);
   }
 }
@@ -1058,5 +1076,6 @@ window.addEventListener('productsLoaded', () => {
   // Se for a home, recarregar o slider de times também
   if (pageName === 'index') renderTeamSlider('todos');
 });
+
 
 
