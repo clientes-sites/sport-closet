@@ -6,7 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Copa 2026 — Sport Closet</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=Inter:wght@400;500;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -15,8 +17,10 @@
   <div class="hero-slider" id="heroSlider">
     <div class="slide active">
       <picture>
-        <source media="(max-width: 768px)" srcset="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/hero-1-mobile.jpg">
-        <img src="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/hero-1-desktop.jpg" alt="Banner Camisas de Seleção" loading="eager">
+        <source media="(max-width: 768px)"
+          srcset="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/hero-1-mobile.jpg">
+        <img src="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/hero-1-desktop.jpg"
+          alt="Banner Camisas de Seleção" loading="eager">
       </picture>
       <div class="slide-content">
         <div class="slide-subtitle">COPA 2026</div>
@@ -28,12 +32,9 @@
   <div class="filter-section">
     <div class="section-title">COPA <span>2026</span></div>
     <div class="fg-label">Filtrar por Patrocinadora:</div>
-    <div class="filter-group">
-        <button class="fb active" data-g="tipo" data-v="todos" onclick="setFilter('tipo','todos')">TODAS</button>
-        <button class="fb" data-g="tipo" data-v="nike" onclick="setFilter('tipo','nike')">NIKE</button>
-        <button class="fb" data-g="tipo" data-v="adidas" onclick="setFilter('tipo','adidas')">ADIDAS</button>
-        <button class="fb" data-g="tipo" data-v="puma" onclick="setFilter('tipo','puma')">PUMA</button>
-        <button class="fb" data-g="tipo" data-v="outras" onclick="setFilter('tipo','outras')">OUTRAS</button>
+    <div class="filter-group" id="dynamicSponsorFilters">
+      <button class="fb active" data-g="tipo" data-v="todos" onclick="setFilter('tipo','todos')">TODAS</button>
+      <!-- Injetado dinamicamente via loja.js -->
     </div>
   </div>
 
@@ -48,4 +49,5 @@
   <script src="loja.js"></script>
   <script src="animacoes.js"></script>
 </body>
+
 </html>

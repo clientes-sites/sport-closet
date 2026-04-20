@@ -1,53 +1,64 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sport Closet — Admin</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sport Closet — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
+
 <body>
 
-<!-- AUTH -->
-<div id="authOverlay" class="auth-overlay">
-  <div class="auth-box">
-    <span class="auth-badge">Admin</span>
-    <div class="auth-title">Sport <span>Closet</span></div>
-    <p class="auth-sub">Digite a senha para acessar o painel.</p>
-    <div class="pass-wrap">
-      <input type="password" id="adminPasswordInput" placeholder="Senha do admin" autocomplete="current-password">
-      <button class="pass-toggle" type="button" id="passToggle" title="Mostrar senha">
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
-    </div>
-    <button type="button" id="adminLoginBtn" class="auth-btn">Entrar</button>
-    <div id="authError" class="auth-error"></div>
-  </div>
-</div>
-
-<!-- LOADING OVERLAY -->
-<div id="loadingOverlay" class="auth-overlay" style="display:none; z-index: 10000;">
-  <div class="auth-box" style="text-align: center; box-shadow: none; background: transparent; padding: 0;">
-    <div class="spinner" style="margin: 0 auto; width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-    <p style="margin-top:20px; color:#fff; font-family: 'DM Sans', sans-serif; font-weight: 500;">Buscando dados do Google Sheets...</p>
-  </div>
-</div>
-
-<!-- CONFIRM -->
-<div class="confirm-dialog" id="confirmDialog">
-  <div class="confirm-box">
-    <h3 id="confirmTitle">Confirmar ação</h3>
-    <p id="confirmMsg">Tem certeza?</p>
-    <div class="confirm-actions">
-      <button class="btn" id="confirmCancel">Cancelar</button>
-      <button class="btn btn-danger" id="confirmOk">Confirmar</button>
+  <!-- AUTH -->
+  <div id="authOverlay" class="auth-overlay">
+    <div class="auth-box">
+      <span class="auth-badge">Admin</span>
+      <div class="auth-title">Sport <span>Closet</span></div>
+      <p class="auth-sub">Digite a senha para acessar o painel.</p>
+      <div class="pass-wrap">
+        <input type="password" id="adminPasswordInput" placeholder="Senha do admin" autocomplete="current-password">
+        <button class="pass-toggle" type="button" id="passToggle" title="Mostrar senha">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        </button>
+      </div>
+      <button type="button" id="adminLoginBtn" class="auth-btn">Entrar</button>
+      <div id="authError" class="auth-error"></div>
     </div>
   </div>
-</div>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loadingOverlay" class="auth-overlay" style="display:none; z-index: 10000;">
+    <div class="auth-box" style="text-align: center; box-shadow: none; background: transparent; padding: 0;">
+      <div class="spinner"
+        style="margin: 0 auto; width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite;">
+      </div>
+      <p style="margin-top:20px; color:#fff; font-family: 'DM Sans', sans-serif; font-weight: 500;">Buscando dados do
+        Google Sheets...</p>
+    </div>
+  </div>
+
+  <!-- CONFIRM -->
+  <div class="confirm-dialog" id="confirmDialog">
+    <div class="confirm-box">
+      <h3 id="confirmTitle">Confirmar ação</h3>
+      <p id="confirmMsg">Tem certeza?</p>
+      <div class="confirm-actions">
+        <button class="btn" id="confirmCancel">Cancelar</button>
+        <button class="btn btn-danger" id="confirmOk">Confirmar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ── MODAL DE EDIÇÃO ────────────────────────────────────────── -->
   <div class="edit-modal" id="productModal">
@@ -58,13 +69,18 @@
       </div>
       <div class="modal-body">
         <div class="modal-sections">
-          
+
           <!-- Imagens -->
           <div class="modal-section">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
               <label class="section-label" style="margin:0">Imagens (Cloudflare R2)</label>
               <button class="btn btn-sm" id="btnToggleSettings" title="Configurar Cloudflare R2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3" />
+                  <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
                 Configurações R2
               </button>
             </div>
@@ -77,7 +93,8 @@
                 <input type="password" id="modalToken" placeholder="API Token">
                 <input type="text" id="modalBase" placeholder="Base URL (Ex: https://img.sportcloset.br/)">
               </div>
-              <p style="font-size:10px; color:var(--muted); margin-top:8px;">Essas chaves serão salvas localmente no seu navegador para facilitar futuros uploads.</p>
+              <p style="font-size:10px; color:var(--muted); margin-top:8px;">Essas chaves serão salvas localmente no seu
+                navegador para facilitar futuros uploads.</p>
             </div>
 
             <div class="img-edit-grid">
@@ -86,7 +103,12 @@
                 <div class="field-with-btn">
                   <input type="text" id="modalImg1" placeholder="Imagem 1">
                   <button class="btn-slot-upload" onclick="triggerUpload(1)" title="Upload para R2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
                   </button>
                   <input type="file" id="fileSlot1" style="display:none" onchange="handleSlotUpload(1)">
                 </div>
@@ -96,7 +118,12 @@
                 <div class="field-with-btn">
                   <input type="text" id="modalImg2" placeholder="Imagem 2">
                   <button class="btn-slot-upload" onclick="triggerUpload(2)" title="Upload para R2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
                   </button>
                   <input type="file" id="fileSlot2" style="display:none" onchange="handleSlotUpload(2)">
                 </div>
@@ -106,7 +133,12 @@
                 <div class="field-with-btn">
                   <input type="text" id="modalImg3" placeholder="Imagem 3">
                   <button class="btn-slot-upload" onclick="triggerUpload(3)" title="Upload para R2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
                   </button>
                   <input type="file" id="fileSlot3" style="display:none" onchange="handleSlotUpload(3)">
                 </div>
@@ -182,176 +214,258 @@
     </div>
   </div>
 
-<!-- TOAST -->
-<div id="toast"></div>
+  <!-- TOAST -->
+  <div id="toast"></div>
 
-<!-- LAYOUT -->
-<div class="admin-layout">
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <span class="sidebar-badge">Admin</span>
-      <div class="sidebar-title">Sport <span>Closet</span></div>
-    </div>
-    <div class="nav-section">
-      <div class="nav-label">Painel</div>
-      <button class="nav-btn active" data-tab="produtos">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        Produtos
-      </button>
-      <button class="nav-btn" data-tab="upload">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-        Upload R2
-      </button>
-      <button class="nav-btn" data-tab="exportar">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Backup
-      </button>
-    </div>
-    <div class="sidebar-footer">
-      <div class="stat-box">
-        <span>Produtos</span>
-        <span class="stat-val" id="statCount">0</span>
-      </div>
-    </div>
-  </aside>
-
-  <div class="main-content">
-    <!-- TOP BAR -->
-    <div class="top-bar">
-      <div class="top-bar-title" id="topBarTitle">Produtos</div>
-      <div class="top-bar-actions">
-        <span class="save-status" id="saveStatus"></span>
-        <button class="btn" type="button" id="btnReload" title="Recarregar dados da planilha">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          Recarregar
-        </button>
-        <button class="btn btn-primary" type="button" id="btnAdd">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Novo Produto
-        </button>
-        <button class="btn btn-sheets" type="button" id="btnSave">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          Salvar no Sheets
-        </button>
-        <button class="btn" type="button" id="btnLogout" title="Sair">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Sair
+  <!-- LAYOUT -->
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-badge">Admin</span>
+        <div class="sidebar-title">Sport <span>Closet</span></div>
+        <button class="sidebar-toggle-btn" id="btnSidebarToggle" title="Expandir / Recolher menu">
+          <svg class="icon-collapse" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          <svg class="icon-expand" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
         </button>
       </div>
-    </div>
-
-    <!-- TABS -->
-    <div class="tab-bar">
-      <button class="tab-btn active" data-tab="produtos">Produtos</button>
-      <button class="tab-btn" data-tab="upload">Upload R2</button>
-      <button class="tab-btn" data-tab="exportar">Backup</button>
-    </div>
-
-    <!-- TAB PRODUTOS -->
-    <div class="tab-panel active panel" id="tab-produtos">
-      <div class="filter-bar">
-        <div class="search-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="searchInput" placeholder="Buscar produto, marca, liga…">
+      <div class="nav-section">
+        <div class="nav-label">Painel</div>
+        <button class="nav-btn active" data-tab="produtos">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+          </svg>
+          <span class="nav-btn-text">Produtos</span>
+        </button>
+        <button class="nav-btn" data-tab="upload">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 16 12 12 8 16" />
+            <line x1="12" y1="12" x2="12" y2="21" />
+            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+          </svg>
+          <span class="nav-btn-text">Upload R2</span>
+        </button>
+        <button class="nav-btn" data-tab="exportar">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          <span class="nav-btn-text">Backup</span>
+        </button>
+      </div>
+      <div class="sidebar-footer">
+        <div class="stat-box">
+          <span>Produtos</span>
+          <span class="stat-val" id="statCount">0</span>
         </div>
-        <select class="filter-select" id="filterMarca"><option value="">Todas as marcas</option></select>
-        <select class="filter-select" id="filterTipo"><option value="">Todos os tipos</option></select>
-        <span class="filtered-count" id="filteredCount"></span>
       </div>
-      <div class="table-wrap">
-        <table class="prod-table" id="adminTable">
-          <thead>
-            <tr>
-              <th style="width:40px">#</th>
-              <th style="width:70px">ID</th>
-              <th style="min-width:200px">Produto</th>
-              <th style="width:110px">Marca</th>
-              <th style="width:100px">Tipo</th>
-              <th style="width:100px">Liga</th>
-              <th style="width:100px">Modelo</th>
-              <th style="width:90px">BRL (R$)</th>
-              <th style="width:90px">USA ($)</th>
-              <th class="img-cell">Imagem 1</th>
-              <th class="img-cell">Imagem 2</th>
-              <th class="img-cell">Imagem 3</th>
-              <th style="width:120px">Tamanhos</th>
-              <th style="width:180px">Descrição</th>
-              <th style="width:100px">Badge</th>
-              <th style="width:100px">Status</th>
-              <th style="width:50px"></th>
-            </tr>
+    </aside>
 
-          </thead>
-          <tbody id="adminBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TAB UPLOAD -->
-    <div class="tab-panel panel" id="tab-upload">
-      <div class="panel-card">
-        <div class="panel-card-title">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-          Upload direto para Cloudflare R2
+    <div class="main-content">
+      <!-- TOP BAR -->
+      <div class="top-bar">
+        <div class="top-bar-title" id="topBarTitle">Produtos</div>
+        <div class="top-bar-actions">
+          <span class="save-status" id="saveStatus"></span>
+          <button class="btn" type="button" id="btnReload" title="Recarregar dados da planilha">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10" />
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+            </svg>
+            Recarregar
+          </button>
+          <button class="btn btn-primary" type="button" id="btnAdd">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Novo Produto
+          </button>
+          <button class="btn btn-sheets" type="button" id="btnSave">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+            Salvar no Sheets
+          </button>
+          <button class="btn" type="button" id="btnLogout" title="Sair">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Sair
+          </button>
         </div>
-        <div class="upload-grid">
-          <select id="selectProductRow"></select>
-          <select id="selectImageSlot">
-            <option value="img_1">img_1</option>
-            <option value="img_2">img_2</option>
-            <option value="img_3">img_3</option>
+      </div>
+
+      <!-- TABS -->
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="produtos">Produtos</button>
+        <button class="tab-btn" data-tab="upload">Upload R2</button>
+        <button class="tab-btn" data-tab="exportar">Backup</button>
+      </div>
+
+      <!-- TAB PRODUTOS -->
+      <div class="tab-panel active panel" id="tab-produtos">
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input type="text" id="searchInput" placeholder="Buscar produto, marca, liga…">
+          </div>
+          <select class="filter-select" id="filterMarca">
+            <option value="">Todas as marcas</option>
           </select>
-          <input type="file" id="imageFileUpload" accept="image/*">
-          <input type="text" id="cfAccountId" placeholder="Cloudflare Account ID">
-          <input type="text" id="cfBucketName" placeholder="Bucket Name">
-          <input type="text" id="cfR2BaseUrl" placeholder="R2 Base URL (opcional)">
-          <div class="upload-pass">
-            <input type="password" id="cfApiToken" placeholder="Cloudflare API Token">
-            <button class="pass-toggle" type="button" id="cfTokenToggle" title="Mostrar token">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <select class="filter-select" id="filterTipo">
+            <option value="">Todos os tipos</option>
+          </select>
+          <span class="filtered-count" id="filteredCount"></span>
+        </div>
+        <div class="table-wrap">
+          <table class="prod-table" id="adminTable">
+            <thead>
+              <tr>
+                <th style="width:40px">#</th>
+                <th style="width:70px">ID</th>
+                <th style="min-width:200px">Produto</th>
+                <th style="width:110px">Marca</th>
+                <th style="width:100px">Tipo</th>
+                <th style="width:100px">Liga</th>
+                <th style="width:100px">Modelo</th>
+                <th style="width:90px">BRL (R$)</th>
+                <th style="width:90px">USA ($)</th>
+                <th class="img-cell">Imagem 1</th>
+                <th class="img-cell">Imagem 2</th>
+                <th class="img-cell">Imagem 3</th>
+                <th style="width:120px">Tamanhos</th>
+                <th style="width:180px">Descrição</th>
+                <th style="width:100px">Badge</th>
+                <th style="width:100px">Status</th>
+                <th style="width:50px"></th>
+              </tr>
+
+            </thead>
+            <tbody id="adminBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB UPLOAD -->
+      <div class="tab-panel panel" id="tab-upload">
+        <div class="panel-card">
+          <div class="panel-card-title">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 16 12 12 8 16" />
+              <line x1="12" y1="12" x2="12" y2="21" />
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+            </svg>
+            Upload direto para Cloudflare R2
+          </div>
+          <div class="upload-grid">
+            <select id="selectProductRow"></select>
+            <select id="selectImageSlot">
+              <option value="img_1">img_1</option>
+              <option value="img_2">img_2</option>
+              <option value="img_3">img_3</option>
+            </select>
+            <input type="file" id="imageFileUpload" accept="image/*">
+            <input type="text" id="cfAccountId" placeholder="Cloudflare Account ID">
+            <input type="text" id="cfBucketName" placeholder="Bucket Name">
+            <input type="text" id="cfR2BaseUrl" placeholder="R2 Base URL (opcional)">
+            <div class="upload-pass">
+              <input type="password" id="cfApiToken" placeholder="Cloudflare API Token">
+              <button class="pass-toggle" type="button" id="cfTokenToggle" title="Mostrar token">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
+            </div>
+            <button type="button" id="btnUploadImage" class="btn btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 16 12 12 8 16" />
+                <line x1="12" y1="12" x2="12" y2="21" />
+              </svg>
+              Fazer Upload
             </button>
           </div>
-          <button type="button" id="btnUploadImage" class="btn btn-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/></svg>
-            Fazer Upload
-          </button>
-        </div>
-        <div id="uploadStatus" class="upload-status">Insira a conta Cloudflare, escolha o produto e a imagem.</div>
-      </div>
-    </div>
-
-    <!-- TAB BACKUP -->
-    <div class="tab-panel panel" id="tab-exportar">
-      <div class="info-box">
-        <strong>Fonte de dados: Google Sheets</strong><br>
-        Os produtos são lidos e salvos diretamente na planilha via Apps Script.<br>
-        Use o backup abaixo apenas como <strong>cópia de segurança local</strong> — não é necessário para o funcionamento do site.
-      </div>
-      <div class="panel-card">
-        <div class="panel-card-title">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Backup local (JSON)
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn btn-primary" type="button" id="btnExportJson">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Baixar backup JSON
-          </button>
-          <button class="btn" type="button" id="btnCopy">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copiar JSON
-          </button>
+          <div id="uploadStatus" class="upload-status">Insira a conta Cloudflare, escolha o produto e a imagem.</div>
         </div>
       </div>
-      <div class="panel-card">
-        <div class="panel-card-title">Prévia do backup</div>
-        <textarea id="csvOutput" class="csv-output" readonly placeholder="Clique em Baixar backup JSON para ver o conteúdo aqui…"></textarea>
+
+      <!-- TAB BACKUP -->
+      <div class="tab-panel panel" id="tab-exportar">
+        <div class="info-box">
+          <strong>Fonte de dados: Google Sheets</strong><br>
+          Os produtos são lidos e salvos diretamente na planilha via Apps Script.<br>
+          Use o backup abaixo apenas como <strong>cópia de segurança local</strong> — não é necessário para o
+          funcionamento do site.
+        </div>
+        <div class="panel-card">
+          <div class="panel-card-title">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Backup local (JSON)
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary" type="button" id="btnExportJson">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Baixar backup JSON
+            </button>
+            <button class="btn" type="button" id="btnCopy">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              Copiar JSON
+            </button>
+          </div>
+        </div>
+        <div class="panel-card">
+          <div class="panel-card-title">Prévia do backup</div>
+          <textarea id="csvOutput" class="csv-output" readonly
+            placeholder="Clique em Baixar backup JSON para ver o conteúdo aqui…"></textarea>
+        </div>
       </div>
-    </div>
 
-  </div><!-- /main-content -->
-</div><!-- /admin-layout -->
+    </div><!-- /main-content -->
+  </div><!-- /admin-layout -->
 
-<script src="admin.js"></script>
+  <script src="admin.js"></script>
 </body>
+
 </html>

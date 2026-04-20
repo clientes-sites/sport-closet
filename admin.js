@@ -76,7 +76,7 @@ async function fetchFromSheets() {
   try {
     const res = await fetch(APPS_SCRIPT_URL);
     const json = await res.json();
-    
+
     // Se o Apps Script retornou sucesso e tem dados, usa eles
     if (json.ok && json.data && json.data.length > 0) {
       loadProducts(json.data);
@@ -119,10 +119,11 @@ async function saveToSheets() {
   try {
     const res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      // text/plain evita o CORS preflight que o Apps Script não suporta
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ action: 'save', data: adminProducts })
     });
-    
+
     if (!res.ok) {
       const text = await res.text();
       throw new Error(`Servidor retornou ${res.status}: ${text.slice(0, 50)}...`);
@@ -130,7 +131,7 @@ async function saveToSheets() {
 
     const json = await res.json();
     if (!json.ok) throw new Error(json.error || 'Erro na resposta do Google');
-    
+
     toast(`✓ Sincronizado com Google Sheets! (${json.saved} produtos)`);
     setLoading(false, `Último Sync: ${new Date().toLocaleTimeString('pt-BR')}`);
   } catch (err) {
@@ -169,9 +170,9 @@ function loadProducts(rows) {
 function openProductModal(idx) {
   activeEditIndex = idx;
   const p = adminProducts[idx];
-  
+
   document.getElementById('modalTitle').textContent = p.nome ? `Editar: ${p.nome}` : 'Novo Produto';
-  
+
   // Imagens
   document.getElementById('modalImg1').value = p.img_1 || '';
   document.getElementById('modalImg2').value = p.img_2 || '';
@@ -239,7 +240,7 @@ function saveProductModal() {
   closeProductModal();
   applyFilters();
   updateSidebar();
-  
+
   // Instant Sync: Salva e Publica em um só passo
   saveToSheets();
 }
@@ -376,7 +377,7 @@ function addProduct() {
 
   const maxId = adminProducts.length
     ? Math.max(...adminProducts.map(p => Number(p.id) || 0)) : 0;
-  
+
   const newProduct = {
     id: String(maxId + 1), nome: '', marca: '', tipo: '', liga: '', modelo: '',
     preco_brl: '', preco_usa: '',
@@ -387,10 +388,10 @@ function addProduct() {
   adminProducts.push(newProduct);
   applyFilters();
   updateSidebar();
-  
+
   // Abre o modal imediatamente para o novo produto
   openProductModal(adminProducts.length - 1);
-  
+
   toast('Novo rascunho criado. Preencha os dados e salve no Sheets.');
 }
 
@@ -438,7 +439,7 @@ function loadR2Config() {
   document.getElementById('modalBucket').value = c.bucket || '';
   document.getElementById('modalToken').value = c.token || '';
   document.getElementById('modalBase').value = c.base || '';
-  
+
   // Sincroniza com a aba de upload antiga (opcional)
   if (document.getElementById('cfAccountId')) document.getElementById('cfAccountId').value = c.acct || '';
   if (document.getElementById('cfBucketName')) document.getElementById('cfBucketName').value = c.bucket || '';
@@ -466,14 +467,14 @@ async function handleSlotUpload(num) {
   }
 
   toast(`Subindo "${file.name}" para o R2...`);
-  
+
   try {
     const ep = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(acct)}/r2/buckets/${encodeURIComponent(bucket)}/objects/${encodeURIComponent(file.name)}`;
     const res = await fetch(ep, {
       method: 'PUT',
-      headers: { 
-        Authorization: `Bearer ${token}`, 
-        'Content-Type': file.type || 'application/octet-stream' 
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': file.type || 'application/octet-stream'
       },
       body: file
     });
@@ -483,11 +484,11 @@ async function handleSlotUpload(num) {
     const fileName = file.name;
     const input = document.getElementById(`modalImg${num}`);
     const prev = document.getElementById(`modalImg${num}Prev`);
-    
+
     // Atualiza campo e preview
     input.value = fileName;
     prev.src = prevUrl(fileName);
-    
+
     toast(`✓ Upload concluído: ${fileName}`);
   } catch (err) {
     console.error(err);
@@ -518,7 +519,25 @@ function copyOutput() {
     .catch(() => toast('Erro ao copiar.', 'error'));
 }
 
-// ── TABS ───────────────────────────────────────────────────────────────────
+// ── SIDEBAR TOGGLE ─────────────────────────────────────────────────────────
+function initSidebarToggle() {
+  const sidebar = document.querySelector('.sidebar');
+  const btn = document.getElementById('btnSidebarToggle');
+  if (!sidebar || !btn) return;
+
+  // Restaurar estado salvo
+  if (localStorage.getItem('sc_sidebar_collapsed') === '1') {
+    sidebar.classList.add('collapsed');
+  }
+
+  btn.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    localStorage.setItem('sc_sidebar_collapsed',
+      sidebar.classList.contains('collapsed') ? '1' : '0');
+  });
+}
+
+
 function switchTab(name) {
   document.querySelectorAll('.tab-panel').forEach(p =>
     p.classList.toggle('active', p.id === `tab-${name}`));
@@ -548,8 +567,9 @@ function togglePass(inputId, btnId) {
 // ── INIT ───────────────────────────────────────────────────────────────────
 function initAdmin() {
   if (!isAuth()) return;
-  
+
   loadR2Config(); // Carrega as chaves do Cloudflare salvas localmente
+  initSidebarToggle();
 
   // Sidebar & Tabs
   document.querySelectorAll('.tab-btn, .nav-btn').forEach(b =>
@@ -629,4 +649,4 @@ function initAuth() {
   }
 }
 
-window.addEventListener('DOMContentLoaded', initAuth);
+window.addEventListener('DOMContentLoaded', initAuth);

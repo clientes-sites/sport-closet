@@ -1,4 +1,3 @@
-
 /* ─── CONFIGURAÇÕES ─────────────────────────────────────────────────────── */
 const WPP = '5531992082542';
 const BASE_URL_FOTOS = 'https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/';
@@ -8,10 +7,10 @@ const path = window.location.pathname.split("/").pop();
 const pageName = (path === '' || path === 'index.html') ? 'index' : path.replace(".html", "").toLowerCase();
 
 const pageTypeMap = {
-    'copa2026': 'camisa de seleção',
-    'roupas-verao': ['camiseta', 'shorts', 'regata', 'casaco', 'legging', 'roupa - verão', 'roupa - verao', 'bermuda', 'bone', 'chinelo', 'meia'],
-    'camisas': 'camisa de time',
-    'tenis': 'tênis'
+  'copa2026': 'camisa de seleção',
+  'roupas-verao': ['camiseta', 'shorts', 'regata', 'casaco', 'legging', 'roupa - verão', 'roupa - verao', 'bermuda', 'bone', 'chinelo', 'meia'],
+  'camisas': 'camisa de time',
+  'tenis': 'tênis'
 };
 
 const pageType = pageTypeMap[pageName] || 'todos';
@@ -20,7 +19,8 @@ let activeFilters = {
   tipo: 'todos',
   liga: 'todos',
   marca: 'todos',
-  peca: 'todos'
+  peca: 'todos',
+  collab: 'todos'
 };
 let searchQuery = '';
 let curProd = null;
@@ -54,7 +54,7 @@ const i18n = {
       },
       section: {
         index: [
-          "LANÇAMENTOS <span>IMPERDÍVEIS</span>", 
+          "LANÇAMENTOS <span>IMPERDÍVEIS</span>",
           "MAIS <span>PROCURADOS</span>"
         ],
         finder: "ENCONTRE SEU <span>NOVO MANTO</span>",
@@ -152,7 +152,7 @@ const i18n = {
 
       section: {
         index: [
-          "NEW <span>RELEASES</span>", 
+          "NEW <span>RELEASES</span>",
           "MOST <span>WANTED</span>"
         ],
         finder: "FIND YOUR <span>NEW JERSEY</span>",
@@ -230,7 +230,7 @@ const i18n = {
 /* ─── HELPERS ──────────────────────────────────────────────────────────── */
 const norm = (s) => (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
 
-function isUsa() { 
+function isUsa() {
   const btn = document.getElementById('regionBtn');
   if (btn) return btn.dataset.usa === '1';
   return localStorage.getItem('sport_closet_usa') === '1';
@@ -257,7 +257,7 @@ function wppMsg(p, sz) {
   const priceLabel = isUsa() ? 'Price' : 'Preço';
   const sizePart = sz ? ` | ${sizeLabel}: ${sz}` : '';
   const pricePart = ` | ${priceLabel}: ${formatPrice(p)}`;
-  
+
   const message = isUsa()
     ? `Hello! I saw the product *${p.nome}* (${p.marca}) on Sport Closet and I'd like more information.${sizePart}${pricePart}`
     : `Olá! Vi o produto *${p.nome}* (${p.marca}) na Sport Closet e gostaria de mais informações.${sizePart}${pricePart}`;
@@ -291,30 +291,31 @@ const wppSvg = `<svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.75
 /* ─── FILTROS E BUSCA ───────────────────────────────────────────────────── */
 function setFilter(group, value) {
   activeFilters[group] = value.toLowerCase();
-  
-  // Se mudar a MARCA, resetamos a PEÇA (modelo) para evitar filtros conflitantes
+
+  // Se mudar a MARCA, resetamos a PEÇA (modelo) e COLLAB para evitar filtros conflitantes
   if (group === 'marca') {
     activeFilters.peca = 'todos';
+    activeFilters.collab = 'todos';
   }
 
   document.querySelectorAll(`.fb[data-g="${group}"]`).forEach(b => {
     b.classList.toggle('active', norm(b.dataset.v) === norm(value));
   });
-  
+
   // Limpa o grid antes de re-renderizar para evitar flicker visual de itens antigos
   const grid = document.getElementById('grid') || document.getElementById('grid-drop-exclusivo');
   if (grid) grid.innerHTML = '';
-  
+
   renderGrid();
 }
 
 function handleSearch(val) {
   searchQuery = norm(val);
-  
+
   // UX: Ocultar banners se houver busca ativa
   const isSearching = searchQuery.length > 0;
   document.body.classList.toggle('search-active-ui', isSearching);
-  
+
   renderGrid();
 }
 
@@ -323,12 +324,12 @@ function toggleRegion() {
   const btn = document.getElementById('regionBtn');
   const isCurrentlyUsa = isUsa();
   const newVal = isCurrentlyUsa ? '0' : '1';
-  
+
   if (btn) {
     btn.dataset.usa = newVal;
     btn.textContent = newVal === '1' ? '🇺🇸 USA ($)' : '🇧🇷 Brasil (R$)';
   }
-  
+
   localStorage.setItem('sport_closet_usa', newVal);
   updateStaticTexts();
   renderGrid();
@@ -395,7 +396,7 @@ function updateStaticTexts() {
     if (ft && lang.labels.section.finder) {
       ft.innerHTML = lang.labels.section.finder;
     }
-    
+
     // Títulos específicos da Home (Lançamentos / Mais Procurados)
     if (pageName === 'index') {
       document.querySelectorAll('.section-title').forEach((el, idx) => {
@@ -476,14 +477,14 @@ function updateStaticTexts() {
     tenis: 'Sneakers — Sport Closet',
     'roupas-verao': 'Summer Wear — Sport Closet'
   };
-  
+
   if (document.title && titleMap[pageName]) {
     document.title = isUsa() ? (titleMapEn[pageName] || titleMap[pageName]) : titleMap[pageName];
   }
 
   const footerCopyright = document.querySelector('.footer-legal');
   if (footerCopyright) footerCopyright.textContent = lang.footer.rights;
-  
+
   const footAbout = document.querySelector('.footer-col p');
   if (footAbout) footAbout.textContent = lang.footer.aboutText;
 
@@ -558,78 +559,82 @@ function renderGrid() {
 
       let matchPageType = false;
       if (pageType === 'todos' || pageName === 'index') {
-          matchPageType = true;
+        matchPageType = true;
       } else if (Array.isArray(pageType)) {
-          matchPageType = pageType.map(pt => norm(pt)).includes(pTipo);
+        matchPageType = pageType.map(pt => norm(pt)).includes(pTipo);
       } else {
-          matchPageType = pTipo === norm(pageType);
+        matchPageType = pTipo === norm(pageType);
       }
 
       const matchLigaFilter = pageName !== 'camisas' || activeFilters.liga === 'todos' || pLiga === norm(activeFilters.liga);
       const matchMarcaFilter = (pageName !== 'tenis' && pageName !== 'roupas-verao') || activeFilters.marca === 'todos' || pMarca === norm(activeFilters.marca);
-      
+
       let matchCopaSponsor = true;
       if (pageName === 'copa2026' && activeFilters.tipo !== 'todos') {
-          if (activeFilters.tipo === 'outras') {
-              matchCopaSponsor = !['nike', 'adidas', 'puma'].includes(pMarca);
-          } else {
-              matchCopaSponsor = pMarca === norm(activeFilters.tipo);
-          }
+        if (activeFilters.tipo === 'outras') {
+          matchCopaSponsor = !['nike', 'adidas', 'puma'].includes(pMarca);
+        } else {
+          matchCopaSponsor = pMarca === norm(activeFilters.tipo);
+        }
       }
 
-      const matchBusca = !searchQuery || 
-                         pNome.includes(searchQuery) || 
-                         pMarca.includes(searchQuery) || 
-                         pTipo.includes(searchQuery) || 
-                         pLiga.includes(searchQuery);
-      
+      const matchBusca = !searchQuery ||
+        pNome.includes(searchQuery) ||
+        pMarca.includes(searchQuery) ||
+        pTipo.includes(searchQuery) ||
+        pLiga.includes(searchQuery);
+
       const pModelo = norm(p.modelo);
       const matchPecaFilter = activeFilters.peca === 'todos' || (pageName === 'roupas-verao' ? pTipo === norm(activeFilters.peca) : pModelo === norm(activeFilters.peca));
+      const matchCollabFilter = pageName !== 'roupas-verao' || activeFilters.collab === 'todos' || pModelo === norm(activeFilters.collab);
 
-      return matchPageType && matchLigaFilter && matchMarcaFilter && matchCopaSponsor && matchBusca && matchPecaFilter;
+      return matchPageType && matchLigaFilter && matchMarcaFilter && matchCopaSponsor && matchBusca && matchPecaFilter && matchCollabFilter;
     });
 
     const targetGrid = pageName === 'index' ? 'grid-drop-exclusivo' : 'grid';
     const countEl = document.getElementById('pcount');
     if (countEl) countEl.textContent = `${list.length} ${lang.found}`;
-    
+
     desenharCards(targetGrid, list);
     if (pageName === 'index') {
-        const grid2 = document.getElementById('grid-mais-vistos');
-        if (grid2) grid2.innerHTML = '';
+      const grid2 = document.getElementById('grid-mais-vistos');
+      if (grid2) grid2.innerHTML = '';
     }
 
     // -- LOGIC FOR DYNAMIC FILTERS --
-    if (['tenis', 'roupas-verao', 'camisas'].includes(pageName)) {
-        // Compute base page products completely unfiltered
-        const baseList = source.filter(p => {
-          const pTipo = norm(p.tipo);
-          let matchPageType = false;
-          if (pageType === 'todos' || pageName === 'index') {
-              matchPageType = true;
-          } else if (Array.isArray(pageType)) {
-              matchPageType = pageType.map(pt => norm(pt)).includes(pTipo);
-          } else {
-              matchPageType = pTipo === norm(pageType);
-          }
-          const matchBusca = !searchQuery || 
-                           norm(p.nome).includes(searchQuery) || 
-                           norm(p.marca).includes(searchQuery) || 
-                           pTipo.includes(searchQuery) || 
-                           norm(p.liga).includes(searchQuery);
-          return matchPageType && matchBusca;
-        });
-
-        if (pageName === 'camisas') {
-            updateDynamicFilters('dynamicLigaFilters', 'liga', 'liga', baseList);
-            updateDynamicFilters('dynamicMarcaFilters', 'marca', 'marca', baseList);
-        } else if (pageName === 'tenis') {
-            updateDynamicFilters('dynamicBrandFilters', 'marca', 'marca', baseList);
-            updateDynamicFilters('dynamicModelFilters', 'peca', 'modelo', list);
-        } else if (pageName === 'roupas-verao') {
-            updateDynamicFilters('dynamicBrandFilters', 'marca', 'marca', baseList);
-            updateDynamicFilters('dynamicPieceFilters', 'peca', 'tipo', list);
+    if (['tenis', 'roupas-verao', 'camisas', 'copa2026'].includes(pageName)) {
+      // Compute base page products completely unfiltered
+      const baseList = source.filter(p => {
+        const pTipo = norm(p.tipo);
+        let matchPageType = false;
+        if (pageType === 'todos' || pageName === 'index') {
+          matchPageType = true;
+        } else if (Array.isArray(pageType)) {
+          matchPageType = pageType.map(pt => norm(pt)).includes(pTipo);
+        } else {
+          matchPageType = pTipo === norm(pageType);
         }
+        const matchBusca = !searchQuery ||
+          norm(p.nome).includes(searchQuery) ||
+          norm(p.marca).includes(searchQuery) ||
+          pTipo.includes(searchQuery) ||
+          norm(p.liga).includes(searchQuery);
+        return matchPageType && matchBusca;
+      });
+
+      if (pageName === 'copa2026') {
+        updateDynamicFilters('dynamicSponsorFilters', 'tipo', 'marca', baseList);
+      } else if (pageName === 'camisas') {
+        updateDynamicFilters('dynamicLigaFilters', 'liga', 'liga', baseList);
+        updateDynamicFilters('dynamicMarcaFilters', 'marca', 'marca', baseList);
+      } else if (pageName === 'tenis') {
+        updateDynamicFilters('dynamicBrandFilters', 'marca', 'marca', baseList);
+        updateDynamicFilters('dynamicModelFilters', 'peca', 'modelo', list);
+      } else if (pageName === 'roupas-verao') {
+        updateDynamicFilters('dynamicBrandFilters', 'marca', 'marca', baseList);
+        updateDynamicFilters('dynamicPieceFilters', 'peca', 'tipo', list);
+        updateDynamicFilters('dynamicCollabFilters', 'collab', 'modelo', list);
+      }
     }
 
     refreshFilterVisibility(list);
@@ -644,45 +649,45 @@ function renderGrid() {
  * @param {Array} filteredList A lista de produtos passada para o filtro
  */
 function updateDynamicFilters(containerId, filterGroup, productField, filteredList) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
+  const container = document.getElementById(containerId);
+  if (!container) return;
 
-    // 1. Pegar todos os valores únicos que NÃO estão vazios para este campo
-    const valuesSet = new Set();
-    
-    // Para filtros de nível secundário (peca/modelo), filtramos apenas os que batem com a MARCA selecionada
-    // Ja para filtros de nível primário (marca/liga), olhamos todos os produtos da página
-    filteredList.forEach(p => {
-        const val = p[productField];
-        if (val && val.trim()) {
-            // Se for modelo, só adiciona se bater com a marca ativa (ou se não houver marca ativa)
-            if (filterGroup === 'peca' && activeFilters.marca !== 'todos' && norm(p.marca) !== norm(activeFilters.marca)) return;
-            
-            valuesSet.add(val.trim().toLowerCase());
-        }
-    });
+  // 1. Pegar todos os valores únicos que NÃO estão vazios para este campo
+  const valuesSet = new Set();
 
-    const values = Array.from(valuesSet).sort();
+  // Para filtros de nível secundário (peca/modelo), filtramos apenas os que batem com a MARCA selecionada
+  // Ja para filtros de nível primário (marca/liga), olhamos todos os produtos da página
+  filteredList.forEach(p => {
+    const val = p[productField];
+    if (val && val.trim()) {
+      // Se for modelo, só adiciona se bater com a marca ativa (ou se não houver marca ativa)
+      if (filterGroup === 'peca' && activeFilters.marca !== 'todos' && norm(p.marca) !== norm(activeFilters.marca)) return;
 
-    // 2. Preservar o botão "TODOS"
-    const todosBtn = container.querySelector(`.fb[data-v="todos"], .fp[data-v="todos"]`);
-    container.innerHTML = '';
-    if (todosBtn) {
-        container.appendChild(todosBtn);
-        todosBtn.classList.toggle('active', activeFilters[filterGroup] === 'todos');
+      valuesSet.add(val.trim().toLowerCase());
     }
+  });
 
-    // 3. Criar novos botões
-    values.forEach(v => {
-        const btn = document.createElement('button');
-        btn.className = 'fb';
-        if (activeFilters[filterGroup] === v) btn.classList.add('active');
-        btn.dataset.g = filterGroup;
-        btn.dataset.v = v;
-        btn.textContent = v.toUpperCase();
-        btn.onclick = () => setFilter(filterGroup, v);
-        container.appendChild(btn);
-    });
+  const values = Array.from(valuesSet).sort();
+
+  // 2. Preservar o botão "TODOS"
+  const todosBtn = container.querySelector(`.fb[data-v="todos"], .fp[data-v="todos"]`);
+  container.innerHTML = '';
+  if (todosBtn) {
+    container.appendChild(todosBtn);
+    todosBtn.classList.toggle('active', activeFilters[filterGroup] === 'todos');
+  }
+
+  // 3. Criar novos botões
+  values.forEach(v => {
+    const btn = document.createElement('button');
+    btn.className = 'fb';
+    if (activeFilters[filterGroup] === v) btn.classList.add('active');
+    btn.dataset.g = filterGroup;
+    btn.dataset.v = v;
+    btn.textContent = v.toUpperCase();
+    btn.onclick = () => setFilter(filterGroup, v);
+    container.appendChild(btn);
+  });
 }
 
 /** 
@@ -691,7 +696,7 @@ function updateDynamicFilters(containerId, filterGroup, productField, filteredLi
  */
 function refreshFilterVisibility(filteredList) {
   const allProds = window.produtos || [];
-  
+
   // Para cada grupo de filtro (marca, liga, tipo/sponsor)
   ['marca', 'liga', 'tipo'].forEach(group => {
     const buttons = document.querySelectorAll(`.fb[data-g="${group}"], .fp[data-g="${group}"]`);
@@ -716,7 +721,7 @@ function refreshFilterVisibility(filteredList) {
       });
 
       btn.style.display = exists ? 'inline-block' : 'none';
-      
+
       // Caso o filtro selecionado tenha sumido (improvável com a lógica acima), resetamos
       if (!exists && activeFilters[group] === val) {
         setFilter(group, 'todos');
@@ -731,22 +736,42 @@ function refreshFilterVisibility(filteredList) {
     if (val === 'todos') return;
 
     const exists = allProds.some(p => {
-      // Deve respeitar a página e a marca já selecionada
       let matchPage = false;
       if (pageName === 'index') matchPage = true;
       else if (Array.isArray(pageType)) matchPage = pageType.map(pt => norm(pt)).includes(norm(p.tipo));
       else matchPage = norm(p.tipo) === norm(pageType);
 
       if (!matchPage) return false;
+      if (activeFilters.marca !== 'todos' && norm(p.marca) !== norm(activeFilters.marca)) return false;
 
-      // Respeita a marca selecionada (se houver) para filtrar modelos relevantes
+      // roupas-verao: peca = tipo da peça (camiseta, bermuda…); outros: peca = modelo
+      if (pageName === 'roupas-verao') return norm(p.tipo) === val;
+      return norm(p.modelo) === val;
+    });
+
+    btn.style.display = exists ? 'inline-block' : 'none';
+    if (!exists && activeFilters.peca === val) setFilter('peca', 'todos');
+  });
+
+  // Visibilidade de Filtros de Collab (roupas-verao)
+  const collabButtons = document.querySelectorAll('.fb[data-g="collab"]');
+  collabButtons.forEach(btn => {
+    const val = norm(btn.dataset.v);
+    if (val === 'todos') return;
+
+    const exists = allProds.some(p => {
+      let matchPage = false;
+      if (Array.isArray(pageType)) matchPage = pageType.map(pt => norm(pt)).includes(norm(p.tipo));
+      else matchPage = norm(p.tipo) === norm(pageType);
+
+      if (!matchPage) return false;
       if (activeFilters.marca !== 'todos' && norm(p.marca) !== norm(activeFilters.marca)) return false;
 
       return norm(p.modelo) === val;
     });
 
     btn.style.display = exists ? 'inline-block' : 'none';
-    if (!exists && activeFilters.peca === val) setFilter('peca', 'todos');
+    if (!exists && activeFilters.collab === val) setFilter('collab', 'todos');
   });
 }
 
@@ -759,8 +784,8 @@ function desenharCards(containerId, lista) {
   if (lista.length === 0) {
     grid.innerHTML = `<div class="empty">${lang.empty}</div>`;
     if (pageName !== 'index') {
-        const countEl = document.getElementById('pcount');
-        if (countEl) countEl.textContent = `0 ${lang.found}`;
+      const countEl = document.getElementById('pcount');
+      if (countEl) countEl.textContent = `0 ${lang.found}`;
     }
     return;
   }
@@ -803,7 +828,7 @@ function openModal(id) {
   if (!curProd) return;
   curSize = null;
   const lang = getLang();
-  
+
   carouselImgs = curProd.imgs || [];
   carouselIdx = 0;
   renderCarousel();
@@ -812,7 +837,7 @@ function openModal(id) {
   document.getElementById('mName').textContent = curProd.nome;
   document.getElementById('mType').textContent = tStr(curProd.tipo).toUpperCase();
   document.getElementById('mPrice').textContent = formatPrice(curProd);
-  
+
   const altPrice = isUsa() ? formatPrice({ brl: curProd.brl }) : formatPrice({ usd: curProd.usd });
   const altEl = document.getElementById('mPriceAlt');
   if (altEl) {
@@ -828,7 +853,7 @@ function openModal(id) {
   const wppBtn = document.getElementById('mWpp');
   wppBtn.innerHTML = wppSvg + ' ' + lang.buy;
   wppBtn.onclick = () => window.open(`https://wa.me/${WPP}?text=${wppMsg(curProd, curSize)}`, '_blank');
-  
+
   document.getElementById('overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -852,13 +877,13 @@ function renderCarousel() {
   const track = document.getElementById('carouselTrack');
   track.innerHTML = carouselImgs.map((img, i) => `
     <div class="carousel-slide"><img src="${encodeURI(img)}" loading="${i === 0 ? 'eager' : 'lazy'}"></div>`).join('');
-  
+
   const dots = document.getElementById('carouselDots');
   dots.innerHTML = carouselImgs.length > 1 ? carouselImgs.map((_, i) => `<span class="carousel-dot${i === 0 ? ' active' : ''}" onclick="carouselGoTo(${i})"></span>`).join('') : '';
-  
+
   scrollToSlide(carouselIdx, 'instant');
   updateChevrons();
-  
+
   track.onscroll = () => {
     carouselIdx = Math.round(track.scrollLeft / track.offsetWidth);
     updateDots();
@@ -886,59 +911,59 @@ function updateDots() {
 }
 
 function updateChevrons() {
-    const leftChevron = document.getElementById('chevronLeft');
-    const rightChevron = document.getElementById('chevronRight');
-    if(leftChevron) leftChevron.style.display = carouselImgs.length > 1 && carouselIdx > 0 ? 'flex' : 'none';
-    if(rightChevron) rightChevron.style.display = carouselImgs.length > 1 && carouselIdx < carouselImgs.length - 1 ? 'flex' : 'none';
+  const leftChevron = document.getElementById('chevronLeft');
+  const rightChevron = document.getElementById('chevronRight');
+  if (leftChevron) leftChevron.style.display = carouselImgs.length > 1 && carouselIdx > 0 ? 'flex' : 'none';
+  if (rightChevron) rightChevron.style.display = carouselImgs.length > 1 && carouselIdx < carouselImgs.length - 1 ? 'flex' : 'none';
 }
 
 
 /* ─── INICIALIZAÇÃO ──────────────────────────────────────────────────────── */
 function init() {
-    // 1. Inicializar Estado de Região (Prioridade Máxima)
-    const btn = document.getElementById('regionBtn');
-    const savedUsa = localStorage.getItem('sport_closet_usa');
+  // 1. Inicializar Estado de Região (Prioridade Máxima)
+  const btn = document.getElementById('regionBtn');
+  const savedUsa = localStorage.getItem('sport_closet_usa');
 
-    if (btn) {
-        btn.onclick = null; // Limpa onclick do HTML
-        btn.addEventListener('click', toggleRegion);
-        if (savedUsa === '1') {
-            btn.dataset.usa = '1';
-            btn.textContent = '🇺🇸 USA ($)';
-        } else {
-            btn.dataset.usa = '0';
-            btn.textContent = '🇧🇷 Brasil (R$)';
-        }
+  if (btn) {
+    btn.onclick = null; // Limpa onclick do HTML
+    btn.addEventListener('click', toggleRegion);
+    if (savedUsa === '1') {
+      btn.dataset.usa = '1';
+      btn.textContent = '🇺🇸 USA ($)';
+    } else {
+      btn.dataset.usa = '0';
+      btn.textContent = '🇧🇷 Brasil (R$)';
     }
+  }
 
-    // 2. Traduzir e Renderizar
-    try {
-      updateStaticTexts();
-    } catch (e) {
-      console.error("Erro ao atualizar textos estáticos:", e);
-    }
-    
-    renderGrid();
-    if (pageName === 'index') renderTeamSlider('todos');
-    
-    // 3. Eventos Adicionais
-    const inputs = document.querySelectorAll('.nav-search-input');
-    inputs.forEach(input => {
-        input.addEventListener('input', () => {
-            const val = input.value;
-            inputs.forEach(other => { if (other !== input) other.value = val; });
-            handleSearch(val);
-        });
+  // 2. Traduzir e Renderizar
+  try {
+    updateStaticTexts();
+  } catch (e) {
+    console.error("Erro ao atualizar textos estáticos:", e);
+  }
+
+  renderGrid();
+  if (pageName === 'index') renderTeamSlider('todos');
+
+  // 3. Eventos Adicionais
+  const inputs = document.querySelectorAll('.nav-search-input');
+  inputs.forEach(input => {
+    input.addEventListener('input', () => {
+      const val = input.value;
+      inputs.forEach(other => { if (other !== input) other.value = val; });
+      handleSearch(val);
     });
+  });
 
-    document.querySelector('.mcls')?.addEventListener('click', () => closeModal());
-    document.getElementById('overlay')?.addEventListener('click', (e) => closeModal(e));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  document.querySelector('.mcls')?.addEventListener('click', () => closeModal());
+  document.getElementById('overlay')?.addEventListener('click', (e) => closeModal(e));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-    // 4. Finalizar carregamento suave (Aumentado para evitar pulos em telas internas)
-    setTimeout(() => {
-      document.body.classList.remove('is-loading');
-    }, 600);
+  // 4. Finalizar carregamento suave (Aumentado para evitar pulos em telas internas)
+  setTimeout(() => {
+    document.body.classList.remove('is-loading');
+  }, 600);
 }
 
 /* ─── CARREGAMENTO DOS DADOS DO CSV LOCAL ──────────────────────────────── */
@@ -948,7 +973,7 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw0KrdBrG0Afz4L
 
 function bootStore() {
   document.body.classList.add('is-loading');
-  
+
   // Tenta o Apps Script primeiro (como no admin.js)
   fetch(APPS_SCRIPT_URL)
     .then(res => res.json())
@@ -970,7 +995,7 @@ function bootStore() {
           download: true,
           header: true,
           skipEmptyLines: true,
-          complete: function(results) {
+          complete: function (results) {
             if (results.data && results.data.length > 0) {
               processCSVData(results.data);
               init();
@@ -978,7 +1003,7 @@ function bootStore() {
               loadFallbackCsv();
             }
           },
-          error: function(err) {
+          error: function (err) {
             console.error("Erro ao baixar CSV:", err);
             loadFallbackCsv();
           }
@@ -992,7 +1017,7 @@ function bootStore() {
 function loadFallbackCsv() {
   console.error("Erro total ao carregar dados.");
   const grid = document.getElementById('grid') || document.getElementById('grid-drop-exclusivo');
-  if(grid) grid.innerHTML = '<div class="empty">Erro ao carregar produtos. Verifique sua conexão.</div>';
+  if (grid) grid.innerHTML = '<div class="empty">Erro ao carregar produtos. Verifique sua conexão.</div>';
   window.produtos = [];
   init();
 }
@@ -1009,19 +1034,19 @@ function processCSVData(data) {
       marca: norm(row.marca),
       tipo: norm(row.tipo),
       liga: norm(row.liga),
-      modelo: norm(row.modelo || row.model || row.colecao),
+      modelo: norm(row.Modelo || row.modelo || row.model || row.colecao),
       brl: parseFloat((row.preco_brl || '0').replace(',', '.')) || 0,
       usd: parseFloat((row.preco_usa || '0').replace(',', '.')) || 0,
       tamanhos: tamanhos,
       desc: row.descricao || '',
       badge: row.badge || '',
       imgs: [row.img_1, row.img_2, row.img_3]
-            .filter(img => img && img.trim())
-            .map(img => {
-                const clean = img.trim();
-                if (clean.startsWith('http')) return clean;
-                return BASE_URL_FOTOS + clean;
-            }),
+        .filter(img => img && img.trim())
+        .map(img => {
+          const clean = img.trim();
+          if (clean.startsWith('http')) return clean;
+          return BASE_URL_FOTOS + clean;
+        }),
       status: norm(row.status || 'ativo')
     };
   }).filter(p => p.nome && p.status !== 'arquivado');
@@ -1076,6 +1101,3 @@ window.addEventListener('productsLoaded', () => {
   // Se for a home, recarregar o slider de times também
   if (pageName === 'index') renderTeamSlider('todos');
 });
-
-
-
