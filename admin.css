@@ -183,24 +183,25 @@ body {
   position: sticky;
   top: 0;
   height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  /* esconde conteúdo que vaza */
+  transition: width .25s cubic-bezier(.4, 0, .2, 1);
 }
 
-/* Estado colapsado */
 .sidebar.collapsed {
   width: 56px;
 }
 
+/* Tudo que some quando colapsado */
+.sidebar.collapsed .sb-label,
 .sidebar.collapsed .sidebar-badge,
 .sidebar.collapsed .sidebar-title,
 .sidebar.collapsed .nav-label,
-.sidebar.collapsed .nav-btn-text,
-.sidebar.collapsed .sidebar-footer {
+.sidebar.collapsed .stat-val {
   display: none;
 }
 
+/* Botões ficam só com ícone */
 .sidebar.collapsed .nav-btn {
   padding: 10px 0;
   justify-content: center;
@@ -208,42 +209,28 @@ body {
 }
 
 .sidebar.collapsed .sidebar-header {
-  padding: 20px 0;
-  align-items: center;
+  padding: 18px 0;
   justify-content: center;
-}
-
-.sidebar.collapsed .icon-collapse {
-  display: none;
-}
-
-.icon-expand {
-  display: none;
-}
-
-.sidebar.collapsed .icon-expand {
-  display: block;
-}
-
-/* Botão toggle */
-.sidebar-toggle-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--muted);
-  padding: 4px;
-  margin-top: 10px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: color var(--transition), background var(--transition);
-  width: 100%;
 }
 
-.sidebar-toggle-btn:hover {
-  color: var(--white);
-  background: rgba(255, 255, 255, 0.05);
+.sidebar.collapsed .sidebar-footer {
+  padding: 12px 0;
+  align-items: center;
+}
+
+.sidebar.collapsed .stat-box {
+  justify-content: center;
+  padding: 8px;
+}
+
+.sidebar.collapsed .sb-toggle {
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.sidebar.collapsed .sb-toggle-icon {
+  transform: rotate(180deg);
 }
 
 .sidebar-header {
@@ -326,6 +313,9 @@ body {
   margin-top: auto;
   padding: 16px 20px;
   border-top: 1px solid #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .stat-box {
@@ -345,6 +335,54 @@ body {
   color: var(--accent);
   line-height: 1;
 }
+
+/* Botão toggle — classe PRÓPRIA, nunca nav-btn para não interferir no switchTab */
+.sb-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-family: var(--font-b);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  transition: color var(--transition);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sb-toggle:hover {
+  color: var(--white);
+}
+
+.sb-toggle:hover .sb-toggle-icon {
+  background: #e69500;
+}
+
+.sb-toggle-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #000;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.sb-toggle-icon svg {
+  width: 12px;
+  height: 12px;
+}
+
 
 /* ── MAIN ───────────────────────────────────────────────────── */
 .main-content {

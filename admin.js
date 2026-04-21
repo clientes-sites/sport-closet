@@ -609,14 +609,23 @@ function initAdmin() {
     }
   });
 
-  // Sidebar toggle
+  // ── SIDEBAR TOGGLE ──────────────────────────────────────────
+  // Usa id único e classe própria — NUNCA nav-btn — para não acionar switchTab
   const sidebar = document.getElementById('adminSidebar');
   const toggleBtn = document.getElementById('btnSidebarToggle');
+  const toggleLabel = toggleBtn?.querySelector('.sb-toggle-label');
+
   if (sidebar && toggleBtn) {
-    if (localStorage.getItem('sc_sidebar_collapsed') === '1') sidebar.classList.add('collapsed');
+    // Restaurar estado salvo
+    if (localStorage.getItem('sc_sb_collapsed') === '1') {
+      sidebar.classList.add('collapsed');
+      if (toggleLabel) toggleLabel.textContent = 'Expandir';
+    }
     toggleBtn.addEventListener('click', () => {
       sidebar.classList.toggle('collapsed');
-      localStorage.setItem('sc_sidebar_collapsed', sidebar.classList.contains('collapsed') ? '1' : '0');
+      const collapsed = sidebar.classList.contains('collapsed');
+      localStorage.setItem('sc_sb_collapsed', collapsed ? '1' : '0');
+      if (toggleLabel) toggleLabel.textContent = collapsed ? 'Expandir' : 'Recolher';
     });
   }
 

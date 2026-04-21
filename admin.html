@@ -219,11 +219,10 @@
 
   <!-- LAYOUT -->
   <div class="admin-layout">
-    <aside class="sidebar">
+    <aside class="sidebar" id="adminSidebar">
       <div class="sidebar-header">
         <span class="sidebar-badge">Admin</span>
         <div class="sidebar-title">Sport <span>Closet</span></div>
-        
       </div>
       <div class="nav-section">
         <div class="nav-label">Painel</div>
@@ -235,7 +234,7 @@
             <rect x="3" y="14" width="7" height="7" />
             <rect x="14" y="14" width="7" height="7" />
           </svg>
-          <span class="nav-btn-text">Produtos</span>
+          <span class="sb-label">Produtos</span>
         </button>
         <button class="nav-btn" data-tab="upload">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -244,7 +243,7 @@
             <line x1="12" y1="12" x2="12" y2="21" />
             <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
           </svg>
-          <span class="nav-btn-text">Upload R2</span>
+          <span class="sb-label">Upload R2</span>
         </button>
         <button class="nav-btn" data-tab="exportar">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -253,19 +252,21 @@
             <polyline points="7 10 12 15 17 10" />
             <line x1="12" y1="15" x2="12" y2="3" />
           </svg>
-          <span class="nav-btn-text">Backup</span>
+          <span class="sb-label">Backup</span>
         </button>
       </div>
       <div class="sidebar-footer">
-        <button class="nav-btn" id="btnSidebarToggle" title="Expandir / Recolher menu" style="margin-bottom: 16px; justify-content: center; background: rgba(255, 165, 0, 0.05); color: var(--accent); border-radius: 8px; border-left: none;">
-          <svg class="icon-collapse" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
-          <svg class="icon-expand" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-          <span class="nav-btn-text" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Recolher</span>
-        </button>
         <div class="stat-box">
-          <span>Produtos</span>
+          <span class="sb-label">Produtos</span>
           <span class="stat-val" id="statCount">0</span>
         </div>
+        <!-- Botão de colapso — classe própria, NUNCA nav-btn -->
+        <button class="sb-toggle" id="btnSidebarToggle" title="Recolher / Expandir menu">
+          <div class="sb-toggle-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </div>
+          <span class="sb-toggle-label sb-label">Recolher</span>
+        </button>
       </div>
     </aside>
 
