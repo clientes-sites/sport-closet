@@ -119,7 +119,6 @@ async function saveToSheets() {
   try {
     const res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      // text/plain evita o CORS preflight que o Apps Script não suporta
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ action: 'save', data: adminProducts })
     });
@@ -519,25 +518,7 @@ function copyOutput() {
     .catch(() => toast('Erro ao copiar.', 'error'));
 }
 
-// ── SIDEBAR TOGGLE ─────────────────────────────────────────────────────────
-function initSidebarToggle() {
-  const sidebar = document.querySelector('.sidebar');
-  const btn = document.getElementById('btnSidebarToggle');
-  if (!sidebar || !btn) return;
-
-  // Restaurar estado salvo
-  if (localStorage.getItem('sc_sidebar_collapsed') === '1') {
-    sidebar.classList.add('collapsed');
-  }
-
-  btn.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-    localStorage.setItem('sc_sidebar_collapsed',
-      sidebar.classList.contains('collapsed') ? '1' : '0');
-  });
-}
-
-
+// ── TABS ───────────────────────────────────────────────────────────────────
 function switchTab(name) {
   document.querySelectorAll('.tab-panel').forEach(p =>
     p.classList.toggle('active', p.id === `tab-${name}`));
@@ -569,7 +550,6 @@ function initAdmin() {
   if (!isAuth()) return;
 
   loadR2Config(); // Carrega as chaves do Cloudflare salvas localmente
-  initSidebarToggle();
 
   // Sidebar & Tabs
   document.querySelectorAll('.tab-btn, .nav-btn').forEach(b =>
@@ -628,6 +608,17 @@ function initAdmin() {
       // mas o navegador lidará com isso se definirmos returnValue.
     }
   });
+
+  // Sidebar toggle
+  const sidebar = document.getElementById('adminSidebar');
+  const toggleBtn = document.getElementById('btnSidebarToggle');
+  if (sidebar && toggleBtn) {
+    if (localStorage.getItem('sc_sidebar_collapsed') === '1') sidebar.classList.add('collapsed');
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      localStorage.setItem('sc_sidebar_collapsed', sidebar.classList.contains('collapsed') ? '1' : '0');
+    });
+  }
 
   // Carregamento Inicial Automático
   fetchFromSheets();

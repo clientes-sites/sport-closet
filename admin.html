@@ -223,16 +223,7 @@
       <div class="sidebar-header">
         <span class="sidebar-badge">Admin</span>
         <div class="sidebar-title">Sport <span>Closet</span></div>
-        <button class="sidebar-toggle-btn" id="btnSidebarToggle" title="Expandir / Recolher menu">
-          <svg class="icon-collapse" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          <svg class="icon-expand" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
+        
       </div>
       <div class="nav-section">
         <div class="nav-label">Painel</div>
@@ -266,6 +257,11 @@
         </button>
       </div>
       <div class="sidebar-footer">
+        <button class="nav-btn" id="btnSidebarToggle" title="Expandir / Recolher menu" style="margin-bottom: 16px; justify-content: center; background: rgba(255, 165, 0, 0.05); color: var(--accent); border-radius: 8px; border-left: none;">
+          <svg class="icon-collapse" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+          <svg class="icon-expand" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+          <span class="nav-btn-text" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent);">Recolher</span>
+        </button>
         <div class="stat-box">
           <span>Produtos</span>
           <span class="stat-val" id="statCount">0</span>
