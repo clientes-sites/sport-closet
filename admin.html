@@ -208,8 +208,11 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn" id="btnCancelModal">Cancelar</button>
-        <button class="btn btn-primary" id="btnSaveModal">Salvar Alterações</button>
+        <button class="btn btn-archive" id="btnArchiveModal">🗄 Arquivar</button>
+        <div style="display:flex;gap:12px;">
+          <button class="btn" id="btnCancelModal">Cancelar</button>
+          <button class="btn btn-primary" id="btnSaveModal">Salvar Alterações</button>
+        </div>
       </div>
     </div>
   </div>
@@ -263,7 +266,10 @@
         <!-- Botão de colapso — classe própria, NUNCA nav-btn -->
         <button class="sb-toggle" id="btnSidebarToggle" title="Recolher / Expandir menu">
           <div class="sb-toggle-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
           </div>
           <span class="sb-toggle-label sb-label">Recolher</span>
         </button>
@@ -344,24 +350,19 @@
             <thead>
               <tr>
                 <th style="width:40px">#</th>
-                <th style="width:70px">ID</th>
+                <th style="width:50px">ID</th>
                 <th style="min-width:200px">Produto</th>
-                <th style="width:110px">Marca</th>
+                <th style="width:100px">Marca</th>
                 <th style="width:100px">Tipo</th>
                 <th style="width:100px">Liga</th>
                 <th style="width:100px">Modelo</th>
-                <th style="width:90px">BRL (R$)</th>
-                <th style="width:90px">USA ($)</th>
-                <th class="img-cell">Imagem 1</th>
-                <th class="img-cell">Imagem 2</th>
-                <th class="img-cell">Imagem 3</th>
-                <th style="width:120px">Tamanhos</th>
-                <th style="width:180px">Descrição</th>
-                <th style="width:100px">Badge</th>
-                <th style="width:100px">Status</th>
+                <th style="width:80px">BRL (R$)</th>
+                <th style="width:80px">USA ($)</th>
+                <th class="img-cell">Imagem</th>
+                <th style="width:80px">Badge</th>
+                <th style="width:90px">Status</th>
                 <th style="width:50px"></th>
               </tr>
-
             </thead>
             <tbody id="adminBody"></tbody>
           </table>
