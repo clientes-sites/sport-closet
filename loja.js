@@ -969,7 +969,7 @@ function init() {
 /* ─── CARREGAMENTO DOS DADOS DO CSV LOCAL ──────────────────────────────── */
 const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTJJsi5MlreQayUKZtiZIwb0RcZCPa5ngJOkOmq-uCkKvtxVD8oRvYIJuYosn-22qsXtCsZsHJHfjhs/pub?output=csv';
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw0KrdBrG0Afz4LmUjFL3adH-5AXvlCgQk2fkaWPJpIb-c9wGbo-XzHPTKkTpn5OkR_Rg/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLXV3zG1vZck4-TawFbO7xUoZAQJGoFxE8JPblyMuU7vN_l2fRfaP6Pz2OlKJ0oGy84Q/exec';
 
 function bootStore() {
   document.body.classList.add('is-loading');
