@@ -105,7 +105,7 @@ const i18n = {
       sneakers: { sub: "PISANDO COM ESTILO", tit: "OS MELHORES TÊNIS", cta: "Comprar" },
       europe: { sub: "EM CAMPO", tit: "CLUBES EUROPEUS", cta: "Explorar" },
       worldcup: { sub: "RUMO AO HEXA", tit: "COPA DO MUNDO 2026", cta: "Ver Agora" },
-      summer: { sub: "PARA O DIA A DIA", tit: "ROUPAS DE VERÃO", cta: "Descobrir" }
+      summer: { sub: "PARA O DIA A DIA", tit: "COLLAB NIKE X PALACE", cta: "Descobrir" }
     },
     teamFilters: {
       todos: "TODOS",

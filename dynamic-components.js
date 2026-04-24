@@ -104,7 +104,7 @@ const SHARED_COMPONENTS = {
                 </div>
                 <div class="footer-col">
                     <h4>SOCIAL</h4>
-                    <a href="https://instagram.com/sportcloset" target="_blank" class="insta-circle">
+                    <a href="https://www.instagram.com/sportcloset.co" target="_blank" class="insta-circle">
                         <img src="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/instagram.svg" alt="Instagram">
                     </a>
                 </div>
