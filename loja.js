@@ -34,8 +34,9 @@ const i18n = {
     empty: "Nenhum produto encontrado.",
     found: "produtos encontrados",
     slides: [
-      { sub: "PISANDO COM ESTILO", title: "NEW BALANCE<br>530 SERIES", btn: "EXPLORE AGORA" },
       { sub: "RUMO AO HEXA", title: "CAMISAS DE<br>SELEÇÃO", btn: "VER COLEÇÃO" },
+      { sub: "LEVE A PAIXÃO", title: "CAMISAS<br>DE <span>TIME</span>", btn: "CONFERIR" },
+      { sub: "PISANDO COM ESTILO", title: "NEW BALANCE<br>530 SERIES", btn: "EXPLORE AGORA" },
       { sub: "PARA O DIA A DIA", title: "ROUPAS DE<br>VERÃO", btn: "CONFERIR" }
     ],
 
@@ -119,8 +120,9 @@ const i18n = {
     empty: "No products found.",
     found: "products found",
     slides: [
-      { sub: "STYLE ON YOUR FEET", title: "NEW BALANCE<br>530 SERIES", btn: "EXPLORE NOW" },
       { sub: "NATIONAL TEAMS", title: "SELECTION<br>JERSEYS", btn: "SEE COLLECTION" },
+      { sub: "CARRY THE PASSION", title: "CLUB<br><span>JERSEYS</span>", btn: "DISCOVER" },
+      { sub: "STYLE ON YOUR FEET", title: "NEW BALANCE<br>530 SERIES", btn: "EXPLORE NOW" },
       { sub: "FOR YOUR DAILY", title: "SUMMER<br>WEAR", btn: "DISCOVER" }
     ],
 
