@@ -517,8 +517,8 @@ function updateStaticTexts() {
       if (tit) tit.textContent = data.tit;
       if (cta) cta.textContent = data.cta;
     };
-    updateMosaic(mosaicItems[0], m.sneakers);
-    updateMosaic(mosaicItems[1], m.europe);
+    updateMosaic(mosaicItems[0], m.europe);
+    updateMosaic(mosaicItems[1], m.sneakers);
     updateMosaic(mosaicItems[2], m.worldcup);
     updateMosaic(mosaicItems[3], m.summer);
   }
