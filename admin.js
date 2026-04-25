@@ -1,5 +1,5 @@
 // ─── SPORT CLOSET — admin.js ───────────────────────────────────────────────
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwu0FaJHk2ed2REoj1RrHEq9qS1or6CcmskT3hoGXigg6C5bk0i4PsccE7dUQg5sgU6Eg/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuA8Ke8sd7Gbo96PTtbd-G89_kysoXrD39903zHbfQ53cSe6bfu3piwSsDcs-GWIpp4A/exec';
 
 const BASE_URL_FOTOS = 'https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/';
 const ADMIN_PASSWORD = 'sportcloset123';
