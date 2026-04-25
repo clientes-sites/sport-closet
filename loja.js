@@ -36,7 +36,7 @@ const i18n = {
     slides: [
       { sub: "RUMO AO HEXA", title: "CAMISAS DE<br>SELEÇÃO", btn: "VER COLEÇÃO" },
       { sub: "LEVE A PAIXÃO", title: "CAMISAS<br>DE <span>TIME</span>", btn: "CONFERIR" },
-      { sub: "PISANDO COM ESTILO", title: "NEW BALANCE<br>530 SERIES", btn: "EXPLORE AGORA" },
+      { sub: "PISANDO COM ESTILO", title: "ADIDAS CAMPUS<br>GREEN", btn: "EXPLORE AGORA" },
       { sub: "PARA O DIA A DIA", title: "ROUPAS DE<br>VERÃO", btn: "CONFERIR" }
     ],
 
@@ -122,7 +122,7 @@ const i18n = {
     slides: [
       { sub: "NATIONAL TEAMS", title: "SELECTION<br>JERSEYS", btn: "SEE COLLECTION" },
       { sub: "CARRY THE PASSION", title: "CLUB<br><span>JERSEYS</span>", btn: "DISCOVER" },
-      { sub: "STYLE ON YOUR FEET", title: "NEW BALANCE<br>530 SERIES", btn: "EXPLORE NOW" },
+      { sub: "STYLE ON YOUR FEET", title: "ADIDAS CAMPUS<br>GREEN", btn: "EXPLORE NOW" },
       { sub: "FOR YOUR DAILY", title: "SUMMER<br>WEAR", btn: "DISCOVER" }
     ],
 
