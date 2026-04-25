@@ -1,5 +1,5 @@
 // ─── SPORT CLOSET — admin.js ───────────────────────────────────────────────
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLXV3zG1vZck4-TawFbO7xUoZAQJGoFxE8JPblyMuU7vN_l2fRfaP6Pz2OlKJ0oGy84Q/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwu0FaJHk2ed2REoj1RrHEq9qS1or6CcmskT3hoGXigg6C5bk0i4PsccE7dUQg5sgU6Eg/exec';
 
 const BASE_URL_FOTOS = 'https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/';
 const ADMIN_PASSWORD = 'sportcloset123';
@@ -68,9 +68,13 @@ async function fetchFromSheets() {
     if (json.ok && json.data && json.data.length > 0) {
       loadProducts(json.data);
       window.dispatchEvent(new CustomEvent('productsLoaded', { detail: json.data }));
-      toast(`${json.data.length} produtos carregados do Google Sheets.`);
+      toast(`${json.data.length} produtos carregados do Apps Script.`);
     } else {
-      console.warn("Apps Script sem dados. Tentando CSV Público...");
+      throw new Error('Apps Script sem dados');
+    }
+  } catch (err) {
+    console.warn("Apps Script falhou (CORS?), tentando CSV público...", err);
+    try {
       const csvRes = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTJJsi5MlreQayUKZtiZIwb0RcZCPa5ngJOkOmq-uCkKvtxVD8oRvYIJuYosn-22qsXtCsZsHJHfjhs/pub?output=csv');
       const csvText = await csvRes.text();
       Papa.parse(csvText, {
@@ -79,16 +83,15 @@ async function fetchFromSheets() {
         complete: (results) => {
           loadProducts(results.data);
           window.dispatchEvent(new CustomEvent('productsLoaded', { detail: results.data }));
-          toast(`${results.data.length} produtos carregados via CSV (Apps Script vazio). ⚠️ Cache pode ter até 10min de atraso.`, 'error');
+          toast(`${results.data.length} produtos carregados via CSV (Apps Script com CORS issue). ⚠️ Cache pode ter até 10min de atraso.`, 'error');
         }
       });
+    } catch (csvErr) {
+      console.error("CSV também falhou:", csvErr);
+      toast('Erro ao carregar dados: Apps Script e CSV falharam.', 'error');
     }
-    setLoading(false, '');
-  } catch (err) {
-    console.error(err);
-    setLoading(false, '');
-    toast('Erro ao carregar dados: ' + err.message, 'error');
   } finally {
+    setLoading(false, '');
     if (overlay) overlay.style.display = 'none';
   }
 }
@@ -389,15 +392,59 @@ async function handleSlotUpload(num) {
     document.getElementById('settingsR2').style.display = 'block';
     return;
   }
-  toast(`Subindo "${file.name}" para o R2...`);
+
+  // Limite de 4MB para não estourar o Apps Script (base64 ~33% maior)
+  const MAX_BYTES = 4 * 1024 * 1024;
+  if (file.size > MAX_BYTES) {
+    toast(`Imagem muito grande (${(file.size/1024/1024).toFixed(1)} MB). Máximo: 4 MB.`, 'error');
+    document.getElementById(`fileSlot${num}`).value = '';
+    return;
+  }
+
+  toast(`Preparando "${file.name}" para envio…`);
+
   try {
-    const ep = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(acct)}/r2/buckets/${encodeURIComponent(bucket)}/objects/${encodeURIComponent(file.name)}`;
-    const res = await fetch(ep, {
-      method: 'PUT',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': file.type || 'application/octet-stream' },
-      body: file
+    // Lê o arquivo como base64 no browser (sem CORS — é local)
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]); // remove "data:image/...;base64,"
+      reader.onerror = () => reject(new Error('Erro ao ler o arquivo.'));
+      reader.readAsDataURL(file);
     });
-    if (!res.ok) throw new Error(`Erro R2: ${res.status}`);
+
+    toast(`Subindo "${file.name}" via Apps Script…`);
+
+    const payload = {
+      action: 'uploadR2',
+      acct: acct,
+      bucket: bucket,
+      token: token,
+      fileName: file.name,
+      mimeType: file.type || 'application/octet-stream',
+      base64: base64
+    };
+    console.log('R2 upload payload', payload);
+
+    // Envia para o Apps Script, que faz o PUT no Cloudflare (sem CORS)
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+
+    const raw = await res.text();
+    console.log('R2 upload response status', res.status, raw);
+
+    let json;
+    try {
+      json = JSON.parse(raw);
+    } catch (parseErr) {
+      throw new Error(`Resposta inválida do Apps Script: ${raw}`);
+    }
+
+    if (!res.ok) throw new Error(`Apps Script retornou ${res.status}: ${json.error || raw}`);
+    if (!json.ok) throw new Error(json.error || 'Erro no upload via Apps Script');
+
     const input = document.getElementById(`modalImg${num}`);
     const prev = document.getElementById(`modalImg${num}Prev`);
     input.value = file.name;
@@ -405,7 +452,7 @@ async function handleSlotUpload(num) {
     toast(`✓ Upload concluído: ${file.name}`);
   } catch (err) {
     console.error(err);
-    toast('Falha no upload R2: ' + err.message, 'error');
+    toast('Falha no upload: ' + err.message, 'error');
   } finally {
     document.getElementById(`fileSlot${num}`).value = '';
   }
@@ -442,6 +489,66 @@ function togglePass(inputId, btnId) {
   const inp = document.getElementById(inputId);
   inp.type = inp.type === 'password' ? 'text' : 'password';
   document.getElementById(btnId).title = inp.type === 'password' ? 'Mostrar' : 'Ocultar';
+}
+
+// Upload da aba "Upload R2" — proxy via Apps Script (contorna CORS)
+async function handleTabUpload() {
+  const file = document.getElementById('imageFileUpload')?.files[0];
+  const acct = document.getElementById('cfAccountId')?.value.trim();
+  const bucket = document.getElementById('cfBucketName')?.value.trim();
+  const token = document.getElementById('cfApiToken')?.value.trim();
+  const slot = document.getElementById('selectImageSlot')?.value;
+  const prodIdx = Number(document.getElementById('selectProductRow')?.value);
+  const status = document.getElementById('uploadStatus');
+
+  if (!file) return (status.textContent = '⚠️ Selecione uma imagem.');
+
+  const MAX_BYTES = 4 * 1024 * 1024;
+  if (file.size > MAX_BYTES) {
+    status.textContent = `⚠️ Arquivo muito grande (${(file.size/1024/1024).toFixed(1)} MB). Máximo: 4 MB.`;
+    return;
+  }
+
+  status.textContent = `Preparando "${file.name}"…`;
+  try {
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = () => reject(new Error('Erro ao ler o arquivo.'));
+      reader.readAsDataURL(file);
+    });
+
+    status.textContent = `Subindo "${file.name}" via Apps Script…`;
+
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'uploadR2',
+        fileName: file.name,
+        mimeType: file.type || 'application/octet-stream',
+        base64
+      })
+    });
+
+    if (!res.ok) throw new Error(`Apps Script retornou ${res.status}`);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Erro no upload');
+
+    // Atualiza o produto na memória
+    if (adminProducts[prodIdx] && slot) {
+      adminProducts[prodIdx][slot] = file.name;
+    }
+    const baseUrl = document.getElementById('cfR2BaseUrl')?.value.trim() || BASE_URL_FOTOS;
+    const publicUrl = baseUrl.replace(/\/$/, '') + '/' + encodeURI(file.name);
+    status.innerHTML = `✅ Upload concluído! URL pública: <a href="${publicUrl}" target="_blank">${publicUrl}</a>`;
+    toast(`✓ Upload concluído: ${file.name}`);
+    document.getElementById('imageFileUpload').value = '';
+  } catch (err) {
+    console.error(err);
+    status.textContent = '❌ Falha: ' + err.message;
+    toast('Falha no upload: ' + err.message, 'error');
+  }
 }
 
 function initAdmin() {
@@ -496,6 +603,9 @@ function initAdmin() {
 
   document.getElementById('cfTokenToggle')?.addEventListener('click', () =>
     togglePass('cfApiToken', 'cfTokenToggle'));
+
+  // Upload da aba "Upload R2" — também via Apps Script (CORS fix)
+  document.getElementById('btnUploadImage')?.addEventListener('click', handleTabUpload);
 
   // Sidebar toggle
   const sidebar = document.getElementById('adminSidebar');
